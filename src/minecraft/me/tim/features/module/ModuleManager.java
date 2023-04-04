@@ -1,5 +1,6 @@
 package me.tim.features.module;
 
+import me.tim.features.module.impl.combat.Backtrack;
 import me.tim.features.module.impl.combat.KillAura;
 import me.tim.features.module.impl.combat.Tickbase;
 import me.tim.features.module.impl.combat.Velocity;
@@ -26,6 +27,7 @@ public class ModuleManager {
         this.modules.add(new KillAura());
         this.modules.add(new Velocity());
         this.modules.add(new Tickbase());
+        this.modules.add(new Backtrack());
 
         this.modules.add(new Fly());
         this.modules.add(new NoSlow());

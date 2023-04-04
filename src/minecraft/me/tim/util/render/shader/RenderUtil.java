@@ -181,6 +181,22 @@ public class RenderUtil {
         Gui.drawRect(18, 70, -18, (int) (70 - lineWidth), color.getRGB());
     }
 
+    public static boolean drawEntityStatic(Entity entity, Vec3 realPos) {
+        float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * Statics.getTimer().renderPartialTicks;
+        int i = entity.getBrightnessForRender(Statics.getTimer().renderPartialTicks);
+
+        if (entity.isBurning())
+        {
+            i = 15728880;
+        }
+
+        int j = i % 65536;
+        int k = i / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        return Statics.getMinecraft().getRenderManager().doRenderEntity(entity, realPos.xCoord - Statics.getMinecraft().getRenderManager().renderPosX, realPos.yCoord - Statics.getMinecraft().getRenderManager().renderPosY, realPos.zCoord - Statics.getMinecraft().getRenderManager().renderPosZ, f, Statics.getTimer().renderPartialTicks, true);
+    }
+
     public static Vec3 getInterpolatedPosition(Entity entity) {
         return new Vec3(
                 MathUtil.interpolate(entity.lastTickPosX, entity.posX, Statics.getTimer().renderPartialTicks),
