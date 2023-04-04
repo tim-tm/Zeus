@@ -1,4 +1,5 @@
 bin/
 target/
 .idea/
-resource/objects/
+resource/assets/objects/
+logs/
