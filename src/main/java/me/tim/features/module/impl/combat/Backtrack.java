@@ -10,6 +10,7 @@ import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.Timer;
+import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -46,12 +47,9 @@ public class Backtrack extends Module {
 
     @EventTarget
     private void onPre(EventPreMotion eventPreMotion) {
-        if (this.entityInformation == null || this.entityInformation.entity == null) return;
+        if (this.entityInformation == null) return;
 
-        // TODO: Proper "calculation"
-        if (this.entityInformation.hit) {
-            this.entityInformation.realPosition = new Vec3(this.entityInformation.entity.posX, this.entityInformation.entity.posY, this.entityInformation.entity.posZ);
-        } else {
+        if ((this.entityInformation.entity == null || this.entityInformation.entity.isDead) && (this.entityInformation.realPosition == null || !this.entityInformation.realPosition.equals(new Vec3(0, 0, 0)))) {
             this.entityInformation.realPosition = new Vec3(0, 0, 0);
         }
     }
@@ -92,12 +90,19 @@ public class Backtrack extends Module {
             case RECEIVE:
                 if (eventPacket.getPacket() instanceof S14PacketEntity) {
                     S14PacketEntity packetEntity = (S14PacketEntity) eventPacket.getPacket();
-                    if (this.entityInformation.hit && packetEntity.getEntity(Statics.getWorld()).equals(this.entityInformation.entity)) {
+                    Entity entity = packetEntity.getEntity(Statics.getWorld());
+                    if (this.entityInformation.hit && entity != null && entity.equals(this.entityInformation.entity)) {
                         if (!this.timer.elapsed((long) this.delaySetting.getValue())) {
                             eventPacket.setCancelled(true);
+
+                            double posX = packetEntity.getX() / 32.0D;
+                            double posY = packetEntity.getX() / 32.0D;
+                            double posZ = packetEntity.getX() / 32.0D;
+                            this.entityInformation.realPosition = this.entityInformation.entity.getPositionVector().addVector(posX, posY, posZ);
                         } else {
                             this.timer.reset();
                             this.entityInformation.hit = false;
+                            this.entityInformation.realPosition = new Vec3(0, 0, 0);
                         }
                     }
                 }
