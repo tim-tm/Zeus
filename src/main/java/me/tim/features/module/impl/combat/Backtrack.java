@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.server.S00PacketKeepAlive;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.src.Config;
 import net.minecraft.util.Vec3;
@@ -62,7 +64,7 @@ public class Backtrack extends Module {
         GlStateManager.pushMatrix();
         RenderHelper.enableStandardItemLighting();
 
-        RenderUtil.drawEntityStatic(this.entityInformation.entity, this.entityInformation.realPosition);
+        RenderUtil.drawEntityStatic(this.entityInformation.entity, this.entityInformation.realPosition, 0.35f);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.disableTexture2D();
