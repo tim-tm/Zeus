@@ -6,8 +6,10 @@ import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.BooleanSetting;
+import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.Timer;
+import me.tim.util.common.EnumUtil;
 import me.tim.util.player.BlockUtil;
 import me.tim.util.player.rotation.Rotation;
 import me.tim.util.render.shader.RenderUtil;
@@ -19,11 +21,13 @@ import org.lwjgl.input.Keyboard;
 import java.awt.*;
 
 public class Scaffold extends Module {
+    private ModeSetting towerModeSetting;
     private NumberSetting delaySetting;
     private BooleanSetting safeWalkSetting;
 
     private final BlockUtil blockUtil;
     private final Rotation rotation;
+    private TowerMode towerMode;
 
     private final Timer timer;
 
@@ -36,6 +40,8 @@ public class Scaffold extends Module {
 
     @Override
     protected void setupSettings() {
+        this.settings.add(this.towerModeSetting = new ModeSetting("Tower Mode", "How should be towered?", TowerMode.values(), TowerMode.VANILLA));
+
         this.settings.add(this.delaySetting = new NumberSetting("Place-Delay", "Delay between block placements!", 0, 500, 125));
 
         this.settings.add(this.safeWalkSetting = new BooleanSetting("SafeWalk", "Stop on block edges!", true));
@@ -43,11 +49,26 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onUpdate(EventUpdate eventUpdate) {
+        this.towerMode = (TowerMode) EnumUtil.fromName(this.towerModeSetting.getCurrentMode().getName(), TowerMode.values());
+
         BlockPos pos = new BlockPos(Statics.getPlayer().posX, Statics.getPlayer().posY - 0.5, Statics.getPlayer().posZ);
         this.blockUtil.findPos(pos);
 
         if (this.blockUtil.getFacing() == null || this.blockUtil.getPos() == null) return;
         this.rotation.apply(this.blockUtil.getFacing());
+
+        if (this.towerMode == null || !Statics.getGameSettings().keyBindSneak.pressed) return;
+        switch (this.towerMode) {
+            case NCP:
+                Statics.getPlayer().motionX = 0;
+                Statics.getPlayer().motionZ = 0;
+
+                if (Statics.getPlayer().ticksExisted % 3 == 0) {
+                    Statics.getPlayer().setPosition(Statics.getPlayer().posX, MathHelper.floor_double(Statics.getPlayer().posY), Statics.getPlayer().posZ);
+                    Statics.getPlayer().motionY = 0.42;
+                }
+                break;
+        }
     }
 
     @EventTarget
@@ -191,5 +212,21 @@ public class Scaffold extends Module {
 
     public boolean isSafeWalkEnabled() {
         return this.safeWalkSetting.getValue();
+    }
+
+    private enum TowerMode implements ModeSetting.ModeTemplate {
+        VANILLA("Vanilla"),
+        NCP("NCP");
+
+        private final String name;
+
+        TowerMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
     }
 }
