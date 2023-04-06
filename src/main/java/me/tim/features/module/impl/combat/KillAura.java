@@ -14,6 +14,7 @@ import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.Timer;
 import me.tim.util.common.EnumUtil;
 import me.tim.util.common.MathUtil;
+import me.tim.util.player.InventoryUtil;
 import me.tim.util.player.rotation.Rotation;
 import me.tim.util.player.rotation.RotationUtil;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -21,9 +22,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import org.lwjgl.input.Keyboard;
 import viamcp.ViaMCP;
 
@@ -32,21 +36,22 @@ import java.util.ArrayList;
 public class KillAura extends Module {
     private ModeSetting targetModeSetting, autoBlockModeSetting;
     private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting;
-    private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting;
+    private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting;
 
-    private Rotation rotation;
-    private final Timer attackTimer, switchTimer;
+    private final Rotation rotation;
+    private final Timer attackTimer, switchTimer, annoyTimer;
     private EntityLivingBase currTarget;
 
     private TargetMode targetMode;
     private BlockMode blockMode;
-    private ArrayList<EntityLivingBase> switchEntities;
+    private final ArrayList<EntityLivingBase> switchEntities;
     private Teams teamsModule;
 
     public KillAura() {
         super("KillAura", "Auto-kill everybody!", Keyboard.KEY_R, Category.COMBAT);
         this.attackTimer = new Timer();
         this.switchTimer = new Timer();
+        this.annoyTimer = new Timer();
         this.rotation = new Rotation();
         this.switchEntities = new ArrayList<>();
     }
@@ -62,6 +67,7 @@ public class KillAura extends Module {
         this.settings.add(this.dRangeSetting = new NumberSetting("Detection-Range", "The Range in which you are going to detect targets!", 3f, 15f, 5f));
         this.settings.add(this.switchDelaySetting = new NumberSetting("Switch Delay", "Delay between switching targets!", 0, 500, 125));
 
+        this.settings.add(this.autoAnnoySetting = new BooleanSetting("Auto-Annoy", "Auto-Annoy by using Rods, Eggs or Snowballs!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Prevent sprinting while attacking!", false));
         this.settings.add(this.moveFixSetting = new BooleanSetting("MoveFix", "Legit strafing!", true));
         this.settings.add(this.newHitDelaySetting = new BooleanSetting("1.9 Hit Delay", "Hit Delayed due to how newer MC Versions work!", false));
@@ -119,6 +125,7 @@ public class KillAura extends Module {
         Statics.getPlayer().rotationYawHead = rotation.getYaw();
         Statics.getPlayer().renderYawOffset = rotation.getYaw();
         Statics.getPlayer().rotationPitchHead = rotation.getPitch();
+        this.handleAutoAnnoy();
     }
 
     @EventTarget
@@ -151,7 +158,7 @@ public class KillAura extends Module {
 
     @EventTarget
     private void onTick(EventTick event) {
-        if (this.currTarget == null || Statics.getMinecraft().currentScreen instanceof GuiInventory) return;
+        if (Statics.getPlayer() == null || this.currTarget == null || Statics.getMinecraft().currentScreen instanceof GuiInventory) return;
 
         if (this.currTarget.getDistanceToEntity(Statics.getPlayer()) <= this.aRangeSetting.getValue()) {
             long aps = MathUtil.random(this.apsSetting.getValue() - this.apsSetting.getValue() / 4f, this.apsSetting.getValue()).longValue();
@@ -204,6 +211,30 @@ public class KillAura extends Module {
                         break;
                 }
                 break;
+        }
+    }
+    
+    private void handleAutoAnnoy() {
+        if (!this.autoAnnoySetting.getValue() || this.currTarget == null || !Statics.getPlayer().canEntityBeSeen(this.currTarget)) return;
+
+        InventoryUtil.ItemInformation itemStack = InventoryUtil.searchAnnoyable();
+        if (itemStack == null || itemStack.getId() == -1) return;
+
+        long delay = 150;
+        if (itemStack.getItemStack().getItem() instanceof ItemFishingRod) {
+            delay += 1000;
+        }
+
+        int currentPlayerItem = Statics.getPlayer().inventory.currentItem;
+        double dist = Statics.getPlayer().getDistanceToEntity(this.currTarget);
+        if (dist <= this.dRangeSetting.getValue() && dist > this.aRangeSetting.getValue()) {
+            if (this.annoyTimer.elapsed(delay)) {
+                Statics.sendPacket(new C09PacketHeldItemChange(itemStack.getId()));
+                Statics.sendPacket(new C08PacketPlayerBlockPlacement(itemStack.getItemStack()));
+                itemStack.getItemStack().useItemRightClick(Statics.getWorld(), Statics.getPlayer());
+                Statics.sendPacket(new C09PacketHeldItemChange(currentPlayerItem));
+                this.annoyTimer.reset();
+            }
         }
     }
 

@@ -75,4 +75,49 @@ public class InventoryUtil {
         }
         return true;
     }
+
+    public static boolean isAnnoyable(ItemStack itemStack) {
+        return itemStack != null
+                && (itemStack.getItem() instanceof ItemFishingRod || itemStack.getItem() instanceof ItemSnowball || itemStack.getItem() instanceof ItemEgg);
+    }
+
+    public static ItemInformation searchAnnoyable() {
+        for (int i = 36; i <= 44; i++) {
+            ItemStack itemStack = Statics.getPlayer().inventoryContainer.getSlot(i).getStack();
+            if (InventoryUtil.isAnnoyable(itemStack)) {
+                return new ItemInformation(itemStack, i - 36);
+            }
+        }
+        return null;
+    }
+
+    public static final class ItemInformation {
+        private ItemStack itemStack;
+        private int id;
+
+        public ItemInformation(ItemStack itemStack, int id) {
+            this.itemStack = itemStack;
+            this.id = id;
+        }
+
+        public ItemInformation() {
+            this(null, -1);
+        }
+
+        public ItemStack getItemStack() {
+            return itemStack;
+        }
+
+        public void setItemStack(ItemStack itemStack) {
+            this.itemStack = itemStack;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+    }
 }

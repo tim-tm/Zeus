@@ -87,6 +87,7 @@ public class Backtrack extends Module {
                 if (eventPacket.getPacket() instanceof C02PacketUseEntity && ((C02PacketUseEntity) eventPacket.getPacket()).getAction().equals(C02PacketUseEntity.Action.ATTACK)) {
                     this.entityInformation.hit = true;
                     this.entityInformation.entity = ((C02PacketUseEntity) eventPacket.getPacket()).getEntityFromWorld(Statics.getWorld());
+                    this.entityInformation.realPosition = this.entityInformation.entity.getPositionVector();
                 }
                 break;
             case RECEIVE:
@@ -100,7 +101,7 @@ public class Backtrack extends Module {
                             double posX = packetEntity.getX() / 32.0D;
                             double posY = packetEntity.getX() / 32.0D;
                             double posZ = packetEntity.getX() / 32.0D;
-                            this.entityInformation.realPosition = this.entityInformation.entity.getPositionVector().addVector(posX, posY, posZ);
+                            this.entityInformation.realPosition.addVector(posX, posY, posZ);
                         } else {
                             this.timer.reset();
                             this.entityInformation.hit = false;

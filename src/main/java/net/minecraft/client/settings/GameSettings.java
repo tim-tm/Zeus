@@ -56,11 +56,11 @@ import org.lwjgl.opengl.DisplayMode;
 
 public class GameSettings
 {
-    private static final Logger gson = LogManager.getLogger();
-    private static final Gson typeListString = new Gson();
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Gson GSON = new Gson();
 
     /** GUI scale values */
-    private static final ParameterizedType GUISCALES = new ParameterizedType()
+    private static final ParameterizedType typeListString = new ParameterizedType()
     {
         public Type[] getActualTypeArguments()
         {
@@ -75,14 +75,14 @@ public class GameSettings
             return null;
         }
     };
-    private static final String[] PARTICLES = new String[] {"options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"};
-    private static final String[] AMBIENT_OCCLUSIONS = new String[] {"options.particles.all", "options.particles.decreased", "options.particles.minimal"};
-    private static final String[] STREAM_COMPRESSIONS = new String[] {"options.ao.off", "options.ao.min", "options.ao.max"};
-    private static final String[] STREAM_CHAT_MODES = new String[] {"options.stream.compression.low", "options.stream.compression.medium", "options.stream.compression.high"};
-    private static final String[] STREAM_CHAT_FILTER_MODES = new String[] {"options.stream.chat.enabled.streaming", "options.stream.chat.enabled.always", "options.stream.chat.enabled.never"};
-    private static final String[] STREAM_MIC_MODES = new String[] {"options.stream.chat.userFilter.all", "options.stream.chat.userFilter.subs", "options.stream.chat.userFilter.mods"};
-    private static final String[] CLOUDS_TYPES = new String[] {"options.stream.mic_toggle.mute", "options.stream.mic_toggle.talk"};
-    private static final String[] setModelParts = new String[] {"options.off", "options.graphics.fast", "options.graphics.fancy"};
+    private static final String[] GUISCALES = new String[] {"options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"};
+    private static final String[] PARTICLES = new String[] {"options.particles.all", "options.particles.decreased", "options.particles.minimal"};
+    private static final String[] AMBIENT_OCCLUSIONS = new String[] {"options.ao.off", "options.ao.min", "options.ao.max"};
+    private static final String[] STREAM_COMPRESSION = new String[] {"options.stream.compression.low", "options.stream.compression.medium", "options.stream.compression.high"};
+    private static final String[] STREAM_CHAT_MODES = new String[] {"options.stream.chat.enabled.streaming", "options.stream.chat.enabled.always", "options.stream.chat.enabled.never"};
+    private static final String[] STREAM_CHAT_FILTER_MODES = new String[] {"options.stream.chat.userFilter.all", "options.stream.chat.userFilter.subs", "options.stream.chat.userFilter.mods"};
+    private static final String[] STREAM_MIC_MODES = new String[] {"options.stream.mic_toggle.mute", "options.stream.mic_toggle.talk"};
+    private static final String[] CLOUDS_SETTING = new String[] {"options.off", "options.graphics.fast", "options.graphics.fancy"};
     public float mouseSensitivity = 0.5F;
     public boolean invertMouse;
     public int renderDistanceChunks = -1;
@@ -807,7 +807,7 @@ public class GameSettings
             }
             else if (settingOption == GameSettings.Options.GUI_SCALE)
             {
-                return this.particleSetting >= PARTICLES.length ? s1 + this.particleSetting + "x" : s1 + getTranslation(PARTICLES, this.particleSetting);
+                return this.particleSetting >= GUISCALES.length ? s1 + this.particleSetting + "x" : s1 + getTranslation(GUISCALES, this.particleSetting);
             }
             else if (settingOption == GameSettings.Options.CHAT_VISIBILITY)
             {
@@ -815,31 +815,31 @@ public class GameSettings
             }
             else if (settingOption == GameSettings.Options.PARTICLES)
             {
-                return s1 + getTranslation(AMBIENT_OCCLUSIONS, this.language);
+                return s1 + getTranslation(PARTICLES, this.language);
             }
             else if (settingOption == GameSettings.Options.AMBIENT_OCCLUSION)
             {
-                return s1 + getTranslation(STREAM_COMPRESSIONS, this.ambientOcclusion);
+                return s1 + getTranslation(AMBIENT_OCCLUSIONS, this.ambientOcclusion);
             }
             else if (settingOption == GameSettings.Options.STREAM_COMPRESSION)
             {
-                return s1 + getTranslation(STREAM_CHAT_MODES, this.streamCompression);
+                return s1 + getTranslation(STREAM_COMPRESSION, this.streamCompression);
             }
             else if (settingOption == GameSettings.Options.STREAM_CHAT_ENABLED)
             {
-                return s1 + getTranslation(STREAM_CHAT_FILTER_MODES, this.streamChatEnabled);
+                return s1 + getTranslation(STREAM_CHAT_MODES, this.streamChatEnabled);
             }
             else if (settingOption == GameSettings.Options.STREAM_CHAT_USER_FILTER)
             {
-                return s1 + getTranslation(STREAM_MIC_MODES, this.streamChatUserFilter);
+                return s1 + getTranslation(STREAM_CHAT_FILTER_MODES, this.streamChatUserFilter);
             }
             else if (settingOption == GameSettings.Options.STREAM_MIC_TOGGLE_BEHAVIOR)
             {
-                return s1 + getTranslation(CLOUDS_TYPES, this.streamMicToggleBehavior);
+                return s1 + getTranslation(STREAM_MIC_MODES, this.streamMicToggleBehavior);
             }
             else if (settingOption == GameSettings.Options.RENDER_CLOUDS)
             {
-                return s1 + getTranslation(setModelParts, this.clouds);
+                return s1 + getTranslation(CLOUDS_SETTING, this.clouds);
             }
             else if (settingOption == GameSettings.Options.GRAPHICS)
             {
@@ -997,7 +997,7 @@ public class GameSettings
 
                             if (astring[0].equals("resourcePacks"))
                             {
-                                this.resourcePacks = (List)typeListString.fromJson((String)s.substring(s.indexOf(58) + 1), GUISCALES);
+                                this.resourcePacks = (List) GSON.fromJson((String)s.substring(s.indexOf(58) + 1), typeListString);
 
                                 if (this.resourcePacks == null)
                                 {
@@ -1007,7 +1007,7 @@ public class GameSettings
 
                             if (astring[0].equals("incompatibleResourcePacks"))
                             {
-                                this.incompatibleResourcePacks = (List)typeListString.fromJson((String)s.substring(s.indexOf(58) + 1), GUISCALES);
+                                this.incompatibleResourcePacks = (List) GSON.fromJson((String)s.substring(s.indexOf(58) + 1), typeListString);
 
                                 if (this.incompatibleResourcePacks == null)
                                 {
@@ -1253,7 +1253,7 @@ public class GameSettings
                         }
                         catch (Exception exception)
                         {
-                            gson.warn("Skipping bad option: " + s);
+                            LOGGER.warn("Skipping bad option: " + s);
                             exception.printStackTrace();
                         }
                     }
@@ -1265,7 +1265,7 @@ public class GameSettings
             }
             catch (Exception exception1)
             {
-                gson.error((String)"Failed to load options", (Throwable)exception1);
+                LOGGER.error((String)"Failed to load options", (Throwable)exception1);
                 break label2;
             }
             finally
@@ -1336,8 +1336,8 @@ public class GameSettings
                     printwriter.println("renderClouds:true");
             }
 
-            printwriter.println("resourcePacks:" + typeListString.toJson((Object)this.resourcePacks));
-            printwriter.println("incompatibleResourcePacks:" + typeListString.toJson((Object)this.incompatibleResourcePacks));
+            printwriter.println("resourcePacks:" + GSON.toJson((Object)this.resourcePacks));
+            printwriter.println("incompatibleResourcePacks:" + GSON.toJson((Object)this.incompatibleResourcePacks));
             printwriter.println("lastServer:" + this.smoothCamera);
             printwriter.println("lang:" + this.forceUnicodeFont);
             printwriter.println("chatVisibility:" + this.chatVisibility.getChatVisibility());
@@ -1399,7 +1399,7 @@ public class GameSettings
         }
         catch (Exception exception)
         {
-            gson.error((String)"Failed to save options", (Throwable)exception);
+            LOGGER.error((String)"Failed to save options", (Throwable)exception);
         }
 
         this.saveOfOptions();
