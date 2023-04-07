@@ -7,16 +7,16 @@ import me.tim.features.module.impl.combat.Velocity;
 import me.tim.features.module.impl.exploit.Blink;
 import me.tim.features.module.impl.exploit.FastPlace;
 import me.tim.features.module.impl.exploit.Phase;
+import me.tim.features.module.impl.move.Fly;
 import me.tim.features.module.impl.move.NoSlow;
 import me.tim.features.module.impl.move.Scaffold;
+import me.tim.features.module.impl.move.Step;
 import me.tim.features.module.impl.player.Cleaner;
 import me.tim.features.module.impl.player.FastBridge;
 import me.tim.features.module.impl.player.Stealer;
-import me.tim.features.module.impl.move.Fly;
 import me.tim.features.module.impl.player.Teams;
 import me.tim.features.module.impl.render.*;
 
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 public class ModuleManager {
@@ -32,6 +32,7 @@ public class ModuleManager {
         this.modules.add(new Fly());
         this.modules.add(new NoSlow());
         this.modules.add(new Scaffold());
+        this.modules.add(new Step());
 
         this.modules.add(new Stealer());
         this.modules.add(new Cleaner());
