@@ -4,6 +4,7 @@ import me.tim.Statics;
 import me.tim.features.command.Command;
 import me.tim.features.event.EventPostMotion;
 import me.tim.features.event.EventPreMotion;
+import me.tim.features.event.EventSlowDown;
 import me.tim.features.event.EventUpdate;
 import me.tim.features.module.impl.combat.KillAura;
 import me.tim.features.module.impl.move.NoSlow;
@@ -58,6 +59,8 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
+
+import javax.vecmath.Vector2f;
 
 public class EntityPlayerSP extends AbstractClientPlayer
 {
@@ -827,10 +830,18 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding() && !Statics.getZeus().moduleManager.getModuleByClass(NoSlow.class).isEnabled())
+
+
+        if (this.isUsingItem() && !this.isRiding())
         {
-            this.movementInput.moveStrafe *= 0.2F;
-            this.movementInput.moveForward *= 0.2F;
+            EventSlowDown eventSlowDown = new EventSlowDown(new Vector2f(0.2f, 0.2f));
+            eventSlowDown.call();
+            if (eventSlowDown.isCancelled()) {
+                eventSlowDown.setMultiplier(new Vector2f(1, 1));
+            }
+
+            this.movementInput.moveStrafe *= eventSlowDown.getMultiplier().x;
+            this.movementInput.moveForward *= eventSlowDown.getMultiplier().y;
             this.sprintToggleTimer = 0;
         }
 
