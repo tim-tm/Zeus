@@ -1,11 +1,10 @@
 package me.tim.util.player;
 
 import me.tim.Statics;
-import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.block.*;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.*;
-import net.minecraft.tileentity.TileEntityChest;
 
 public class InventoryUtil {
     public static boolean isInventoryFull() {
@@ -81,6 +80,15 @@ public class InventoryUtil {
                 && (itemStack.getItem() instanceof ItemFishingRod || itemStack.getItem() instanceof ItemSnowball || itemStack.getItem() instanceof ItemEgg);
     }
 
+    public static boolean isBlock(ItemStack stack) {
+        if (stack == null || !(stack.getItem() instanceof ItemBlock)) return false;
+        ItemBlock block = (ItemBlock) stack.getItem();
+        if (block.getBlock() == null) return false;
+
+        boolean condition = block.getBlock() instanceof BlockChest || block.getBlock() instanceof BlockEnderChest || block.getBlock() instanceof BlockSlime;
+        return !condition;
+    }
+
     public static ItemInformation searchAnnoyable() {
         for (int i = 36; i <= 44; i++) {
             ItemStack itemStack = Statics.getPlayer().inventoryContainer.getSlot(i).getStack();
@@ -91,13 +99,25 @@ public class InventoryUtil {
         return null;
     }
 
-    public static ItemInformation searchBlocks() {
+    public static ItemInformation searchBlocksHotbar() {
         for (int i = 0; i < 9; i++) {
             ItemStack itemStack = Statics.getPlayer().inventory.getStackInSlot(i);
             if (itemStack == null) continue;
 
-            if (itemStack.getItem() instanceof ItemBlock) {
+            if (InventoryUtil.isBlock(itemStack)) {
                 return new ItemInformation(itemStack, i);
+            }
+        }
+        return null;
+    }
+
+    public static ItemInformation searchBlocks() {
+        for (int i = 9; i < Statics.getPlayer().inventory.getSizeInventory(); i++) {
+            ItemStack stack = Statics.getPlayer().inventory.getStackInSlot(i);
+            if (stack == null) continue;
+
+            if (InventoryUtil.isBlock(stack)) {
+                return new ItemInformation(stack, i);
             }
         }
         return null;
