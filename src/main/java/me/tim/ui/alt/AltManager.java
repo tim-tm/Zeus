@@ -6,6 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import me.tim.Statics;
+import me.tim.features.event.EventMove;
+import me.tim.features.event.EventPacket;
+import me.tim.features.event.api.EventManager;
+import me.tim.features.event.api.EventTarget;
 import me.tim.features.friend.Friend;
 import me.tim.ui.notify.Notification;
 import me.tim.util.SessionUtil;
@@ -16,10 +20,18 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.multiplayer.GuiConnecting;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.handshake.client.C00Handshake;
+import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.File;
@@ -33,6 +45,7 @@ public class AltManager extends GuiScreen {
     private final GuiScreen parent;
     private final ArrayList<Alt> alts;
     private final JsonUtility jsonUtility;
+    private MSLoginThread msLoginThread;
 
     public AltManager(GuiScreen parent) {
         this.parent = parent;
@@ -56,27 +69,20 @@ public class AltManager extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         Gui.drawRect(0, 0, this.width, this.height, new Color(20, 20, 20).getRGB());
+        if (this.msLoginThread != null) {
+            Alt alt = this.msLoginThread.alt;
+            for (GuiButton guiButton : this.buttonList) {
+                if (guiButton instanceof AltButton && ((AltButton) guiButton).getAlt().equals(alt)) {
+                    ((AltButton) guiButton).setLoggedIn(!this.msLoginThread.isAlive());
+                }
+            }
+        }
+
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        if (button instanceof AltButton) {
-            AltButton altButton = (AltButton) button;
-            if (altButton.getAlt() == null) return;
-
-            switch (altButton.getAlt().getAltType()) {
-                case CRACKED:
-                    Session s = SessionUtil.createCrackedSession(altButton.getAlt().getUser());
-                    Statics.getZeus().notificationRenderer.sendNotification(new Notification("Login", "Login successful (" + altButton.getAlt().getUser() + ")!", Notification.NotificationType.SUCCESS));
-                    Statics.setSession(s);
-                    break;
-                case MICROSOFT:
-                    new MSLoginThread(altButton.getAlt()).start();
-                    break;
-            }
-        }
-
         if (button instanceof RemoveButton) {
             RemoveButton removeButton = (RemoveButton) button;
             if (removeButton.altButton != null && removeButton.altButton.getAlt() != null) {
@@ -86,6 +92,24 @@ public class AltManager extends GuiScreen {
 
         if (button instanceof AddButton) {
             this.mc.displayGuiScreen(new AddAltScreen(this));
+        }
+
+        if (button instanceof AltButton) {
+            AltButton altButton = (AltButton) button;
+            if (altButton.getAlt() == null) return;
+
+            switch (altButton.getAlt().getAltType()) {
+                case CRACKED:
+                    Session s = SessionUtil.createCrackedSession(altButton.getAlt().getUser());
+                    Statics.getZeus().notificationRenderer.sendNotification(new Notification("Login", "Login successful (" + altButton.getAlt().getUser() + ")!", Notification.NotificationType.SUCCESS));
+                    Statics.setSession(s);
+                    altButton.setLoggedIn(true);
+                    break;
+                case MICROSOFT:
+                    this.msLoginThread = new MSLoginThread(altButton.getAlt());
+                    this.msLoginThread.start();
+                    break;
+            }
         }
     }
 
@@ -100,6 +124,7 @@ public class AltManager extends GuiScreen {
     }
 
     public void removeAlt(Alt alt) {
+        this.buttonList.removeIf(guiButton -> guiButton instanceof AltButton && ((AltButton) guiButton).getAlt().equals(alt));
         this.alts.remove(alt);
         this.jsonUtility.save();
     }
@@ -299,7 +324,10 @@ public class AltManager extends GuiScreen {
     }
 
     private static final class AltButton extends GuiButton {
+        private static final ResourceLocation msLogo = new ResourceLocation("zeus/icon/microsoft.png");
+
         private final Alt alt;
+        private boolean loggedIn;
 
         public AltButton(int buttonId, int y, int screenW, Alt alt) {
             super(buttonId, screenW / 4, y, screenW / 2, 50, alt.getUser());
@@ -311,11 +339,29 @@ public class AltManager extends GuiScreen {
             if (!this.visible) return;
             this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
-            Gui.drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, new Color(35, 35, 35).getRGB());
+            Gui.drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, this.loggedIn ? new Color(55, 205, 55).getRGB() : new Color(35, 35, 35).getRGB());
             RenderUtil.drawHead(this.getSkin(this.displayString), this.xPosition + 5, this.yPosition + 5, this.height - 10, this.height - 10);
 
-            String str = this.displayString + ":" + this.alt.getAltType().name();
-            Statics.getFontRenderer().drawString(str, this.xPosition + this.height + 5, this.yPosition + this.height / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2, -1);
+            Statics.getFontRenderer().drawString(this.displayString, this.xPosition + this.height + 5, this.yPosition + this.height / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2, -1);
+
+            if (!this.hovered && this.alt.getAltType().equals(Alt.AltType.MICROSOFT)) {
+                GlStateManager.pushMatrix();
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.color(1, 1, 1, 1);
+
+                ITextureObject textureObject = Statics.getMinecraft().getTextureManager().getTexture(msLogo);
+                if (textureObject == null) {
+                    GlStateManager.disableBlend();
+                    GlStateManager.popMatrix();
+                    return;
+                }
+
+                GlStateManager.bindTexture(textureObject.getGlTextureId());
+                Gui.drawScaledCustomSizeModalRect(this.xPosition + this.width - 42, this.yPosition + 10, 0, 0, 512, 512, 30, 30, 512, 512);
+                GlStateManager.disableBlend();
+                GlStateManager.popMatrix();
+            }
         }
 
         public ResourceLocation getSkin(String name) {
@@ -333,6 +379,14 @@ public class AltManager extends GuiScreen {
 
         public Alt getAlt() {
             return alt;
+        }
+
+        public void setLoggedIn(boolean loggedIn) {
+            this.loggedIn = loggedIn;
+        }
+
+        public boolean isLoggedIn() {
+            return loggedIn;
         }
     }
 
