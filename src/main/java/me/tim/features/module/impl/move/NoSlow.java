@@ -48,11 +48,7 @@ public class NoSlow extends Module {
                 Statics.sendPacket(new C08PacketPlayerBlockPlacement(Statics.getPlayer().getCurrentEquippedItem()));
                 break;
             case GRIM:
-                event.setCancelled(true);
-                if (this.timer.elapsed(25)) {
-                    Statics.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                    this.timer.reset();
-                }
+                event.setMultiplier(new Vector2f(0.68f, 0.68f));
                 break;
         }
     }

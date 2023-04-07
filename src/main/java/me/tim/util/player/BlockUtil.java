@@ -3,46 +3,44 @@ package me.tim.util.player;
 import me.tim.Statics;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3i;
-
-import java.util.ArrayList;
 
 public class BlockUtil {
-    private final ArrayList<Vec3i> facings;
-    
     private BlockPos pos;
-    private Vec3i facing;
+    private EnumFacing enumFacing;
 
-    public BlockUtil(BlockPos pos, Vec3i facing) {
+    public BlockUtil(BlockPos pos, EnumFacing enumFacing) {
         this.pos = pos;
-        this.facing = facing;
-        
-        this.facings = new ArrayList<>();
-        for (EnumFacing value : EnumFacing.values()) {
-            this.facings.add(value.getDirectionVec());
-        }
-        this.facings.add(new Vec3i(-1, 0, -1));
-        this.facings.add(new Vec3i(1, 0, -1));
-        this.facings.add(new Vec3i(-1, 0, 1));
-        this.facings.add(new Vec3i(1, 0, 1));
+        this.enumFacing = enumFacing;
     }
 
     public BlockUtil() {
         this(null, null);
     }
 
-    public void findPos(BlockPos pos) {
-        for (Vec3i facing : this.facings) {
-            if (!Statics.getWorld().isAirBlock(pos.add(facing))) {
-                this.pos = pos.add(facing);
-                this.facing = facing;
+    public void find(BlockPos pos1) {
+        for (int x = -1; x <= 1; x += 2) {
+            if (!Statics.getWorld().isAirBlock(pos1.add(x, 0, 0))) {
+                this.pos = pos1.add(x, 0, 0);
+                this.enumFacing = x < 0 ? EnumFacing.EAST : EnumFacing.WEST;
+            }
+        }
+
+        if (!Statics.getWorld().isAirBlock(pos1.add(0, -1, 0))) {
+            this.pos = pos1.add(0, -1, 0);
+            this.enumFacing = EnumFacing.UP;
+        }
+
+        for (int z = -1; z <= 1; z += 2) {
+            if (!Statics.getWorld().isAirBlock(pos1.add(0, 0, z))) {
+                this.pos = pos1.add(0, 0, z);
+                this.enumFacing = z < 0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
             }
         }
     }
 
     public void reset() {
         this.pos = null;
-        this.facing = null;
+        this.enumFacing = null;
     }
 
     public BlockPos getPos() {
@@ -53,11 +51,11 @@ public class BlockUtil {
         this.pos = pos;
     }
 
-    public Vec3i getFacing() {
-        return facing;
+    public EnumFacing getEnumFacing() {
+        return enumFacing;
     }
 
-    public void setFacing(Vec3i facing) {
-        this.facing = facing;
+    public void setEnumFacing(EnumFacing enumFacing) {
+        this.enumFacing = enumFacing;
     }
 }

@@ -450,6 +450,66 @@ public class PlayerControllerMP
         }
     }
 
+    public boolean onPlayerRightClick(EntityPlayerSP player, WorldClient worldIn, int slotId, BlockPos hitPos, EnumFacing side)
+    {
+        boolean flag = false;
+
+        ItemStack heldStack = player.inventory.getStackInSlot(slotId);
+        if (!this.mc.theWorld.getWorldBorder().contains(hitPos))
+        {
+            return false;
+        }
+        else
+        {
+            if (this.currentGameType != WorldSettings.GameType.SPECTATOR)
+            {
+                IBlockState iblockstate = worldIn.getBlockState(hitPos);
+
+                if ((!player.isSneaking() || player.getHeldItem() == null) && iblockstate.getBlock().onBlockActivated(worldIn, hitPos, iblockstate, player, side, 0, 0, 0))
+                {
+                    flag = true;
+                }
+
+                if (!flag && heldStack != null && heldStack.getItem() instanceof ItemBlock)
+                {
+                    ItemBlock itemblock = (ItemBlock)heldStack.getItem();
+
+                    if (!itemblock.canPlaceBlockOnSide(worldIn, hitPos, side, player, heldStack))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            this.netClientHandler.addToSendQueue(new C08PacketPlayerBlockPlacement(hitPos, side.getIndex(), player.inventory.getCurrentItem(), 0, 0, 0));
+
+            if (!flag && this.currentGameType != WorldSettings.GameType.SPECTATOR)
+            {
+                if (heldStack == null)
+                {
+                    return false;
+                }
+                else if (this.currentGameType.isCreative())
+                {
+                    int i = heldStack.getMetadata();
+                    int j = heldStack.stackSize;
+                    boolean flag1 = heldStack.onItemUse(player, worldIn, hitPos, side, 0, 0, 0);
+                    heldStack.setItemDamage(i);
+                    heldStack.stackSize = j;
+                    return flag1;
+                }
+                else
+                {
+                    return heldStack.onItemUse(player, worldIn, hitPos, side, 0, 0, 0);
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
+
     /**
      * Notifies the server of things like consuming food, etc...
      */

@@ -11,11 +11,20 @@ import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.Timer;
 import me.tim.util.common.EnumUtil;
 import me.tim.util.player.BlockUtil;
+import me.tim.util.player.InventoryUtil;
 import me.tim.util.player.rotation.Rotation;
+import me.tim.util.player.rotation.RotationUtil;
 import me.tim.util.render.shader.RenderUtil;
+import net.minecraft.block.BlockAir;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemSlab;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -23,11 +32,12 @@ import java.awt.*;
 public class Scaffold extends Module {
     private ModeSetting towerModeSetting;
     private NumberSetting delaySetting;
-    private BooleanSetting safeWalkSetting;
+    private BooleanSetting safeWalkSetting, silentSetting;
 
     private final BlockUtil blockUtil;
     private final Rotation rotation;
     private TowerMode towerMode;
+    private int silentSlot, lastSlotSent;
 
     private final Timer timer;
 
@@ -45,17 +55,26 @@ public class Scaffold extends Module {
         this.settings.add(this.delaySetting = new NumberSetting("Place-Delay", "Delay between block placements!", 0, 500, 125));
 
         this.settings.add(this.safeWalkSetting = new BooleanSetting("SafeWalk", "Stop on block edges!", true));
+        this.settings.add(this.silentSetting = new BooleanSetting("Silent", "Place blocks while holding your sword!", false));
     }
 
     @EventTarget
     private void onUpdate(EventUpdate eventUpdate) {
         this.towerMode = (TowerMode) EnumUtil.fromName(this.towerModeSetting.getCurrentMode().getName(), TowerMode.values());
 
-        BlockPos pos = new BlockPos(Statics.getPlayer().posX, Statics.getPlayer().posY - 0.5, Statics.getPlayer().posZ);
-        this.blockUtil.findPos(pos);
+        BlockPos pos = new BlockPos(Statics.getPlayer().getPositionVector().addVector(0, -1, 0));
+        if (Statics.getWorld().getBlockState(pos).getBlock() instanceof BlockAir)
+            this.blockUtil.find(pos);
 
-        if (this.blockUtil.getFacing() == null || this.blockUtil.getPos() == null) return;
-        this.rotation.apply(this.blockUtil.getFacing());
+        if (this.blockUtil.getEnumFacing() == null || this.blockUtil.getPos() == null) return;
+        this.rotation.apply(this.blockUtil);
+
+        if (this.silentSetting.getValue()) {
+            InventoryUtil.ItemInformation itemInformation = InventoryUtil.searchBlocks();
+            if (itemInformation != null) {
+                this.silentSlot = itemInformation.getId();
+            }
+        }
 
         if (this.towerMode == null || !Statics.getGameSettings().keyBindSneak.pressed) return;
         switch (this.towerMode) {
@@ -95,15 +114,20 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onTick(EventTick event) {
-        if (this.blockUtil == null || this.blockUtil.getPos() == null || this.blockUtil.getFacing() == null || this.rotation == null) return;
+        if (this.blockUtil == null || this.blockUtil.getPos() == null || this.rotation == null) return;
 
-        MovingObjectPosition rayTrace = Statics.getPlayer().rayTrace(Statics.getPlayerController().getBlockReachDistance(), this.rotation.getYaw(), this.rotation.getPitch());
-        if (rayTrace == null) return;
-
-        boolean check = rayTrace.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.blockUtil.getPos().equals(rayTrace.getBlockPos()) && rayTrace.hitVec != null && rayTrace.sideHit != null;
+        int slot = this.silentSetting.getValue() ? (this.silentSlot == -1 ? Statics.getPlayer().inventory.currentItem : this.silentSlot) : Statics.getPlayer().inventory.currentItem;
+        ItemStack item = Statics.getPlayer().inventory.getStackInSlot(slot);
+        boolean check = item != null
+                && item.getItem() instanceof ItemBlock
+                && !(item.getItem() instanceof ItemSlab);
         if (!check) return;
 
-        if (this.timer.elapsed((long) this.delaySetting.getValue()) && Statics.getPlayerController().onPlayerRightClick(Statics.getPlayer(), Statics.getWorld(), Statics.getPlayer().getCurrentEquippedItem(), this.blockUtil.getPos(), rayTrace.sideHit, rayTrace.hitVec)) {
+        if (this.silentSetting.getValue() && ((this.lastSlotSent == Statics.getPlayer().inventory.currentItem && this.silentSlot != Statics.getPlayer().inventory.currentItem) || this.silentSlot != this.lastSlotSent)) {
+            Statics.sendPacket(new C09PacketHeldItemChange(this.silentSlot));
+        }
+
+        if (this.timer.elapsed((long) this.delaySetting.getValue()) && Statics.getPlayerController().onPlayerRightClick(Statics.getPlayer(), Statics.getWorld(), slot, this.blockUtil.getPos(), this.blockUtil.getEnumFacing())) {
             Statics.getPlayer().swingItem();
             this.timer.reset();
         }
@@ -198,6 +222,14 @@ public class Scaffold extends Module {
         eventStrafe.setCancelled(true);
     }
 
+    @EventTarget
+    private void onPacket(EventPacket eventPacket) {
+        if (eventPacket.getPacket() instanceof C09PacketHeldItemChange) {
+            C09PacketHeldItemChange heldItemChange = (C09PacketHeldItemChange) eventPacket.getPacket();
+            this.lastSlotSent = heldItemChange.getSlotId();
+        }
+    }
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -208,6 +240,11 @@ public class Scaffold extends Module {
         super.onDisable();
         this.blockUtil.reset();
         this.timer.reset();
+
+        if (Statics.getPlayer() != null && this.silentSlot != -1 && Statics.getPlayer().inventory.currentItem != this.silentSlot) {
+            Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem));
+        }
+        this.silentSlot = -1;
     }
 
     public boolean isSafeWalkEnabled() {
@@ -221,6 +258,23 @@ public class Scaffold extends Module {
         private final String name;
 
         TowerMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
+
+    private enum SwitchMode implements ModeSetting.ModeTemplate {
+        OFF("Off"),
+        DEFAULT("Default"),
+        SILENT("Silent");
+
+        private final String name;
+
+        SwitchMode(String name) {
             this.name = name;
         }
 

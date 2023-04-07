@@ -3,6 +3,7 @@ package me.tim.util.player.rotation;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import me.tim.Statics;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
 import net.optifine.reflect.Reflector;
@@ -31,15 +32,6 @@ public class RotationUtil {
         float pitch = (float) (-(MathHelper.atan2(d1, d3) * 180.0D / Math.PI));
 
         return new Vector2f(yaw, pitch);
-    }
-
-    public static Vector2f faceVector(Vec3 to) {
-        Vec3 localVec = Statics.getPlayer().getPositionEyes(1);
-        Vec3 diff = to.subtract(localVec);
-
-        double diffXZ = Math.hypot(diff.xCoord, diff.zCoord);
-
-        return new Vector2f((float) (Math.toDegrees(Math.atan2(diff.zCoord, diff.xCoord)) - 90f), (float) -Math.toDegrees(Math.atan2(diff.yCoord, diffXZ)));
     }
 
     public static Vec3 getVectorForRotation(float pitch, float yaw) {
@@ -110,5 +102,13 @@ public class RotationUtil {
         }
 
         return pointedEntity;
+    }
+
+    public static Block rayCastBlock(float range, float yaw, float pitch) {
+        Vec3 vec3 = Statics.getPlayer().getPositionEyes(1);
+        Vec3 vec31 = getVectorForRotation(pitch, yaw);
+        Vec3 vec32 = vec3.addVector(vec31.xCoord * range, vec31.yCoord * range, vec31.zCoord * range);
+        MovingObjectPosition pos = Statics.getWorld().rayTraceBlocks(vec3, vec32, false, false, true);
+        return Statics.getWorld().getBlockState(pos.getBlockPos()).getBlock();
     }
 }

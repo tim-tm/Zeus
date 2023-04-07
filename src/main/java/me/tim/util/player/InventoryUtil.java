@@ -91,6 +91,18 @@ public class InventoryUtil {
         return null;
     }
 
+    public static ItemInformation searchBlocks() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = Statics.getPlayer().inventory.getStackInSlot(i);
+            if (itemStack == null) continue;
+
+            if (itemStack.getItem() instanceof ItemBlock) {
+                return new ItemInformation(itemStack, i);
+            }
+        }
+        return null;
+    }
+
     public static final class ItemInformation {
         private ItemStack itemStack;
         private int id;

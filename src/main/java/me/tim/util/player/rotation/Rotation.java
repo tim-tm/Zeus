@@ -1,7 +1,6 @@
 package me.tim.util.player.rotation;
 
 import me.tim.Statics;
-import me.tim.util.common.MathUtil;
 import me.tim.util.player.BlockUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityEgg;
@@ -61,11 +60,15 @@ public class Rotation {
         this.pitch = this.lastPitch + f3;
     }
 
-    public void apply(Vec3i facing) {
-        Vec3 pos = new Vec3(new BlockPos(Statics.getPlayer().posX, Statics.getPlayer().posY - 0.5, Statics.getPlayer().posZ));
-
-        Vector2f blockFace = RotationUtil.faceVector(pos.add(new Vec3(facing)).addVector(0.5d, -3d, 0.5d));
-        this.apply(blockFace.x, blockFace.y);
+    public void apply(BlockUtil util) {
+        EntityEgg entityEgg = new EntityEgg(Statics.getWorld());
+        entityEgg.posX = util.getPos().getX() + 0.5D;
+        entityEgg.posY = util.getPos().getY() + 0.5D;
+        entityEgg.posZ = util.getPos().getZ() + 0.5D;
+        entityEgg.posX += util.getEnumFacing().getDirectionVec().getX() * 0.25D;
+        entityEgg.posY += util.getEnumFacing().getDirectionVec().getY() * 0.25D;
+        entityEgg.posZ += util.getEnumFacing().getDirectionVec().getZ() * 0.25D;
+        this.apply(entityEgg);
     }
 
     public void reset() {
