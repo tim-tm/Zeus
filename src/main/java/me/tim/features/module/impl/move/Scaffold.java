@@ -118,8 +118,10 @@ public class Scaffold extends Module {
 
                 if (Statics.getPlayer().ticksExisted % 4 == 0) {
                     Statics.getPlayer().setPosition(Statics.getPlayer().posX, MathHelper.floor_double(Statics.getPlayer().posY), Statics.getPlayer().posZ);
-                    Statics.getPlayer().jump();
                 }
+                break;
+            case FORWARD:
+                Statics.getGameSettings().keyBindLeft.pressed = Statics.getPlayer().ticksExisted % 2 == 0;
                 break;
         }
     }
@@ -309,7 +311,8 @@ public class Scaffold extends Module {
 
     private enum TowerMode implements ModeSetting.ModeTemplate {
         VANILLA("Vanilla"),
-        NCP("NCP");
+        NCP("NCP"),
+        FORWARD("Forward");
 
         private final String name;
 

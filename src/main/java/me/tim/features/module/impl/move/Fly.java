@@ -15,9 +15,6 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 
 public class Fly extends Module {
@@ -41,7 +38,7 @@ public class Fly extends Module {
         if (this.mode == null) return;
 
         if (this.mode.equals(FlyModes.PACKET)) {
-            Statics.motionFly(eventMove, true, 2);
+            Statics.motionFly(eventMove, true, this.speedSetting.getValue());
         } else {
             Statics.setMoveSpeed(eventMove, this.speedSetting.getValue());
         }
@@ -68,6 +65,9 @@ public class Fly extends Module {
                     this.startData.sendPacket(false);
                 }
                 break;
+            case COLLIDE:
+                event.setOnGround(false);
+                break;
         }
     }
 
@@ -86,7 +86,7 @@ public class Fly extends Module {
             return;
         }
 
-        if (mode.equals(FlyModes.COLLIDE) || this.mode.equals(FlyModes.BLINK)) {
+        if (mode.equals(FlyModes.COLLIDE) || this.mode.equals(FlyModes.BLINK) || mode.equals(FlyModes.IGNORES08)) {
             if (event.getBlock() instanceof BlockAir && event.getBlockPos().getY() < this.startData.getPosY()) {
                 event.setAxisAlignedBB(AxisAlignedBB.fromBounds(
                         event.getBlockPos().getX(),
@@ -124,6 +124,17 @@ public class Fly extends Module {
                     this.startData.setPitch(packetPlayerPosLook.getPitch());
                 }
                 break;
+            case IGNORES08:
+                if (event.getPacket() instanceof S08PacketPlayerPosLook) {
+                    S08PacketPlayerPosLook packetPlayerPosLook = (S08PacketPlayerPosLook) event.getPacket();
+                    packetPlayerPosLook.x = Statics.getPlayer().posX;
+                    packetPlayerPosLook.y = Statics.getPlayer().posY;
+                    packetPlayerPosLook.z = Statics.getPlayer().posZ;
+                    packetPlayerPosLook.yaw = Statics.getPlayer().rotationYaw;
+                    packetPlayerPosLook.pitch = Statics.getPlayer().rotationPitch;
+                    event.setPacket(packetPlayerPosLook);
+                }
+                break;
         }
     }
 
@@ -148,7 +159,8 @@ public class Fly extends Module {
         GLIDE("Glide"),
         COLLIDE("Collide"),
         BLINK("Blink"),
-        PACKET("Packet");
+        PACKET("Packet"),
+        IGNORES08("IgnoreS08");
 
         private final String name;
 
