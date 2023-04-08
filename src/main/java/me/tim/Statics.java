@@ -89,7 +89,7 @@ public class Statics {
     public static void setMoveSpeed(EventMove event, final double speed) {
         double forward = getMovementInput().moveForward;
         double strafe = getMovementInput().moveStrafe;
-        float yaw = getPlayer().rotationYaw;
+        float yaw = EntityPlayer.movementYaw == null ? getPlayer().rotationYaw : EntityPlayer.movementYaw;
         if (forward == 0.0 && strafe == 0.0) {
             event.setX(0.0);
             event.setZ(0.0);

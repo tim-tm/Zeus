@@ -7,10 +7,7 @@ import me.tim.features.module.impl.combat.Velocity;
 import me.tim.features.module.impl.exploit.Blink;
 import me.tim.features.module.impl.exploit.FastPlace;
 import me.tim.features.module.impl.exploit.Phase;
-import me.tim.features.module.impl.move.Fly;
-import me.tim.features.module.impl.move.NoSlow;
-import me.tim.features.module.impl.move.Scaffold;
-import me.tim.features.module.impl.move.Step;
+import me.tim.features.module.impl.move.*;
 import me.tim.features.module.impl.player.Cleaner;
 import me.tim.features.module.impl.player.FastBridge;
 import me.tim.features.module.impl.player.Stealer;
@@ -33,6 +30,7 @@ public class ModuleManager {
         this.modules.add(new NoSlow());
         this.modules.add(new Scaffold());
         this.modules.add(new Step());
+        this.modules.add(new Speed());
 
         this.modules.add(new Stealer());
         this.modules.add(new Cleaner());

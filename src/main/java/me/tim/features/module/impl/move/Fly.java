@@ -38,8 +38,12 @@ public class Fly extends Module {
 
     @EventTarget
     private void onMove(EventMove eventMove) {
-        if (this.mode != null && this.mode.equals(FlyModes.PACKET)) {
+        if (this.mode == null) return;
+
+        if (this.mode.equals(FlyModes.PACKET)) {
             Statics.motionFly(eventMove, true, 2);
+        } else {
+            Statics.setMoveSpeed(eventMove, this.speedSetting.getValue());
         }
     }
 
@@ -55,11 +59,9 @@ public class Fly extends Module {
             case VANILLA:
                 Statics.getPlayer().capabilities.allowFlying = true;
                 Statics.getPlayer().capabilities.isFlying = true;
-                Statics.speed(this.speedSetting.getValue());
                 break;
             case GLIDE:
                 Statics.getPlayer().motionY = -0.1f;
-                Statics.speed(this.speedSetting.getValue());
                 break;
             case PACKET:
                 for (int i = 0; i < 3; i++) {

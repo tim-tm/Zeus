@@ -78,7 +78,7 @@ public class Scaffold extends Module {
         else {
             if (this.rotationMode != null) {
                 switch (this.rotationMode) {
-                    case KEEP:
+                    case STATIC:
                         this.blockUtil.reset();
                         break;
                     case UNLEGIT:
@@ -116,9 +116,9 @@ public class Scaffold extends Module {
                 Statics.getPlayer().motionX = 0;
                 Statics.getPlayer().motionZ = 0;
 
-                if (Statics.getPlayer().ticksExisted % 3 == 0) {
+                if (Statics.getPlayer().ticksExisted % 4 == 0) {
                     Statics.getPlayer().setPosition(Statics.getPlayer().posX, MathHelper.floor_double(Statics.getPlayer().posY), Statics.getPlayer().posZ);
-                    Statics.getPlayer().motionY = 0.42;
+                    Statics.getPlayer().jump();
                 }
                 break;
         }
@@ -326,7 +326,7 @@ public class Scaffold extends Module {
     private enum RotationMode implements ModeSetting.ModeTemplate {
         OFF("Off"),
         DEFAULT("Default"),
-        KEEP("Keep"),
+        STATIC("Static"),
         UNLEGIT("Unlegit");
 
         private final String name;
