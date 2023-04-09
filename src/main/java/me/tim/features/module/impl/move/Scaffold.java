@@ -20,8 +20,6 @@ import net.minecraft.item.ItemSlab;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
-import net.minecraft.network.play.client.C0DPacketCloseWindow;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
@@ -31,7 +29,7 @@ import java.awt.*;
 public class Scaffold extends Module {
     private ModeSetting rotationModeSetting, towerModeSetting;
     private NumberSetting delaySetting;
-    private BooleanSetting safeWalkSetting, silentSetting, sameYSetting, keepSprintSetting, swingSetting, getBlocksSetting;
+    private BooleanSetting safeWalkSetting, silentSetting, sameYSetting, keepSprintSetting, swingSetting;
 
     private final BlockUtil blockUtil;
     private final Rotation rotation;
@@ -60,7 +58,6 @@ public class Scaffold extends Module {
         this.settings.add(this.sameYSetting = new BooleanSetting("SameY", "Jump-Scaffold!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Keep sprinting!", false));
         this.settings.add(this.swingSetting = new BooleanSetting("Swing", "Should swings be visual?", false));
-        this.settings.add(this.getBlocksSetting = new BooleanSetting("GetBlocks", "Get blocks if none in hotbar!", false));
     }
 
     @EventTarget
@@ -75,19 +72,6 @@ public class Scaffold extends Module {
 
         if (Statics.getWorld().getBlockState(pos).getBlock() instanceof BlockAir)
             this.blockUtil.find(pos);
-        else {
-            if (this.rotationMode != null) {
-                switch (this.rotationMode) {
-                    case STATIC:
-                        this.blockUtil.reset();
-                        break;
-                    case UNLEGIT:
-                        this.blockUtil.reset();
-                        this.rotation.reset();
-                        break;
-                }
-            }
-        }
 
         if (this.blockUtil.getEnumFacing() == null || this.blockUtil.getPos() == null) return;
         this.rotation.apply(this.blockUtil);
@@ -96,18 +80,7 @@ public class Scaffold extends Module {
             InventoryUtil.ItemInformation itemInformation = InventoryUtil.searchBlocksHotbar();
             if (itemInformation != null) {
                 this.silentSlot = itemInformation.getId();
-            } else if (this.getBlocksSetting.getValue()) {
-                InventoryUtil.ItemInformation info = InventoryUtil.searchBlocks();
-                if (info != null && Statics.getPlayer().moveStrafing == 0 && Statics.getPlayer().moveForward == 0) {
-                    Statics.sendPacket(new C0BPacketEntityAction(Statics.getPlayer(), C0BPacketEntityAction.Action.OPEN_INVENTORY));
-                    Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, 44 - info.getId(), 0, 6, Statics.getPlayer());
-                    Statics.sendPacket(new C0DPacketCloseWindow(0));
-                }
             }
-        }
-
-        if (Statics.getPlayer().isSprinting() && !this.keepSprintSetting.getValue()) {
-            Statics.getPlayer().setSprinting(false);
         }
 
         if (towerMode == null || !Statics.getGameSettings().keyBindSneak.pressed) return;
@@ -152,11 +125,27 @@ public class Scaffold extends Module {
         Statics.getPlayer().renderYawOffset = yaw;
         Statics.getPlayer().rotationYawHead = yaw;
         Statics.getPlayer().rotationPitchHead = pitch;
+
+        if (!(Statics.getWorld().getBlockState(new BlockPos(Statics.getPlayer().getPositionVector().addVector(0, -1, 0))).getBlock() instanceof BlockAir)) {
+            switch (this.rotationMode) {
+                case STATIC:
+                    this.blockUtil.reset();
+                    break;
+                case UNLEGIT:
+                    this.blockUtil.reset();
+                    this.rotation.reset();
+                    break;
+            }
+        }
     }
 
     @EventTarget
     private void onTick(EventTick event) {
         if (this.blockUtil == null || this.blockUtil.getPos() == null || this.rotation == null) return;
+
+        if (Statics.getPlayer().isSprinting() && !this.keepSprintSetting.getValue() && (this.rotation.getYaw() != Statics.getPlayer().rotationYaw && this.rotation.getPitch() != Statics.getPlayer().rotationPitch)) {
+            Statics.getPlayer().setSprinting(false);
+        }
 
         int slot = this.silentSetting.getValue() ? this.silentSlot : Statics.getPlayer().inventory.currentItem;
         ItemStack item = Statics.getPlayer().inventory.getStackInSlot(slot);
@@ -175,19 +164,18 @@ public class Scaffold extends Module {
             } else {
                 Statics.sendPacket(new C0APacketAnimation());
             }
-            this.timer.reset();
         }
     }
 
     @EventTarget
     private void onStrafe(EventStrafe eventStrafe) {
-        if (this.rotation == null) return;
+        if (this.rotation == null || this.rotation.getYaw() == eventStrafe.getYaw()) return;
 
         final int dif = (int) ((MathHelper.wrapAngleTo180_float(Statics.getPlayer().rotationYaw - this.rotation.getYaw() - 23.5F - 135.0F) + 180.0F) / 45.0F);
         final float strafe = eventStrafe.getStrafe();
         final float forward = eventStrafe.getForward();
         final float friction = eventStrafe.getFriction();
-        
+
         float calcForward = 0.0F;
         float calcStrafe = 0.0F;
         switch (dif) {
@@ -296,12 +284,9 @@ public class Scaffold extends Module {
     }
 
     private void syncCurrentPlayItem() {
-        int i = Statics.getPlayer().inventory.currentItem;
-
-        if (i != this.silentSlot)
-        {
-            this.silentSlot = i;
+        if (Statics.getPlayer().inventory.currentItem != this.silentSlot) {
             Statics.sendPacket(new C09PacketHeldItemChange(this.silentSlot));
+            this.silentSlot = -1;
         }
     }
 

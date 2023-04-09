@@ -23,7 +23,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFishingRod;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 
 public class KillAura extends Module {
     private ModeSetting targetModeSetting, autoBlockModeSetting;
-    private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting;
+    private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting, maxHurtTimeSetting, particleMultiplierSetting;
     private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting;
 
     private final Rotation rotation;
@@ -66,6 +65,8 @@ public class KillAura extends Module {
         this.settings.add(this.twRangeSetting = new NumberSetting("Walls-Range", "The Range in which you are going to attack targets through walls!", 0, 8f, 4f));
         this.settings.add(this.dRangeSetting = new NumberSetting("Detection-Range", "The Range in which you are going to detect targets!", 3f, 15f, 5f));
         this.settings.add(this.switchDelaySetting = new NumberSetting("Switch Delay", "Delay between switching targets!", 0, 500, 125));
+        this.settings.add(this.maxHurtTimeSetting = new NumberSetting("Max-HurtTime", "Maximum HurtTime of Target!", 1, 10, 10));
+        this.settings.add(this.particleMultiplierSetting = new NumberSetting("ParticleMultiplier", "See more particles!", 1, 10, 2));
 
         this.settings.add(this.autoAnnoySetting = new BooleanSetting("Auto-Annoy", "Auto-Annoy by using Rods, Eggs or Snowballs!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Prevent sprinting while attacking!", false));
@@ -160,6 +161,8 @@ public class KillAura extends Module {
     private void onTick(EventTick event) {
         if (Statics.getPlayer() == null || this.currTarget == null || Statics.getMinecraft().currentScreen instanceof GuiInventory) return;
 
+        if (this.currTarget.hurtTime > this.maxHurtTimeSetting.getValue()) return;
+
         if (this.currTarget.getDistanceToEntity(Statics.getPlayer()) <= this.aRangeSetting.getValue()) {
             long aps = MathUtil.random(this.apsSetting.getValue() - this.apsSetting.getValue() / 4f, this.apsSetting.getValue()).longValue();
             if (this.newHitDelaySetting.getValue()) {
@@ -169,7 +172,7 @@ public class KillAura extends Module {
             if (RotationUtil.rayCast(this.aRangeSetting.getValue(), this.rotation) == currTarget && this.attackTimer.elapsed(1000 / aps)) {
                 this.handleAutoBlock(BlockState.PRE);
 
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < this.particleMultiplierSetting.getValue(); i++) {
                     Statics.getPlayer().onEnchantmentCritical(this.currTarget);
                 }
 

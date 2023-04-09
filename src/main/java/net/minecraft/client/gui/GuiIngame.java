@@ -145,11 +145,16 @@ public class GuiIngame extends Gui
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
         new EventBloom().call();
+        this.render(scaledresolution, i, j, partialTicks, false);
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 1);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2);
 
         new EventRender2D(i, j, partialTicks).call();
 
+        this.render(scaledresolution, i, j, partialTicks, true);
+    }
+
+    private void render(ScaledResolution scaledresolution, int i, int j, float partialTicks, boolean crosshair) {
         GlStateManager.enableBlend();
         if (Config.isVignetteEnabled())
         {
@@ -190,7 +195,7 @@ public class GuiIngame extends Gui
         this.mc.getTextureManager().bindTexture(icons);
         GlStateManager.enableBlend();
 
-        if (this.showCrosshair())
+        if (this.showCrosshair() && crosshair)
         {
             GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
             GlStateManager.enableAlpha();

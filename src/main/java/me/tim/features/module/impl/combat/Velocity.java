@@ -16,7 +16,7 @@ import org.lwjgl.input.Keyboard;
 
 public class Velocity extends Module {
     private ModeSetting modeSetting;
-    private NumberSetting percentageSetting;
+    private NumberSetting percentageSetting, ticksSetting;
 
     private VelocityModes mode;
     private boolean actionRequested;
@@ -30,6 +30,7 @@ public class Velocity extends Module {
     protected void setupSettings() {
         this.settings.add(modeSetting = new ModeSetting("Modes", "Select different Velocity's!", VelocityModes.values(), VelocityModes.ZERO));
         this.settings.add(this.percentageSetting = new NumberSetting("Percentage", "Percentage of knockback!", 0, 100, 50));
+        this.settings.add(this.ticksSetting = new NumberSetting("Ticks", "Cancel-Ticks!", 1, 10, 3));
     }
 
     @EventTarget
@@ -38,6 +39,7 @@ public class Velocity extends Module {
         if (this.mode == null) return;
 
         this.percentageSetting.setVisible(this.mode.equals(VelocityModes.PERCENTAGE));
+        this.ticksSetting.setVisible(this.mode.equals(VelocityModes.TICK));
 
         String suffix = this.mode.getName();
         if (this.mode.equals(VelocityModes.PERCENTAGE)) {
@@ -57,6 +59,14 @@ public class Velocity extends Module {
                     if (this.ticks > 2 && this.ticks <= 6) {
                         Statics.multMotion(0.3089f);
                     } else if (this.ticks > 6) {
+                        this.actionRequested = false;
+                    }
+                    break;
+                case TICK:
+                    if (this.ticks > this.ticksSetting.getValue()) {
+                        Statics.getPlayer().motionX = 0;
+                        Statics.getPlayer().motionY = 0;
+                        Statics.getPlayer().motionZ = 0;
                         this.actionRequested = false;
                     }
                     break;
@@ -111,6 +121,7 @@ public class Velocity extends Module {
                 break;
             case GRIM:
             case SNEAK:
+            case TICK:
                 this.actionRequested = true;
                 break;
         }
@@ -134,7 +145,8 @@ public class Velocity extends Module {
         JUMP("Jump"),
         PERCENTAGE("Percentage"),
         SNEAK("Sneak"),
-        GRIM("Grim");
+        GRIM("Grim"),
+        TICK("Tick");
 
         private final String name;
 
