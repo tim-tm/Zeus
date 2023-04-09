@@ -1,7 +1,6 @@
 package me.tim.features.module.impl.move;
 
 import me.tim.Statics;
-import me.tim.features.event.EventPreMotion;
 import me.tim.features.event.EventSlowDown;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
@@ -9,13 +8,8 @@ import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.util.Timer;
 import me.tim.util.common.EnumUtil;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import org.lwjgl.input.Keyboard;
-
-import javax.vecmath.Vector2f;
 
 public class NoSlow extends Module {
     private ModeSetting modeSetting;
@@ -48,7 +42,10 @@ public class NoSlow extends Module {
                 Statics.sendPacket(new C08PacketPlayerBlockPlacement(Statics.getPlayer().getCurrentEquippedItem()));
                 break;
             case GRIM:
-                event.setMultiplier(new Vector2f(0.68f, 0.68f));
+                if (Statics.getPlayer().ticksExisted % 2 == 0) {
+                    event.setCancelled(true);
+                    Statics.sendPacket(new C08PacketPlayerBlockPlacement(Statics.getPlayer().getCurrentEquippedItem()));
+                }
                 break;
         }
     }

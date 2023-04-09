@@ -27,21 +27,23 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 import viamcp.ViaMCP;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class KillAura extends Module {
-    private ModeSetting targetModeSetting, autoBlockModeSetting;
+    private ModeSetting switchModeSetting, autoBlockModeSetting;
     private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting, maxHurtTimeSetting, particleMultiplierSetting;
-    private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting;
+    private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting, searchSetting;
 
     private final Rotation rotation;
     private final Timer attackTimer, switchTimer, annoyTimer;
     private EntityLivingBase currTarget;
 
-    private TargetMode targetMode;
     private BlockMode blockMode;
     private final ArrayList<EntityLivingBase> switchEntities;
     private Teams teamsModule;
@@ -57,7 +59,7 @@ public class KillAura extends Module {
 
     @Override
     protected void setupSettings() {
-        this.settings.add(this.targetModeSetting = new ModeSetting("Target Mode", "How should the target be detected?", TargetMode.values(), TargetMode.SINGLE));
+        this.settings.add(this.switchModeSetting = new ModeSetting("Switch Mode", "How should the target be detected?", SwitchMode.values(), SwitchMode.RANGE));
         this.settings.add(this.autoBlockModeSetting = new ModeSetting("AutoBlock Mode", "The way, the KillAura is going to block for you!", BlockMode.values(), BlockMode.OFF));
 
         this.settings.add(this.apsSetting = new NumberSetting("APS", "How often do you want to attack in a second?", 1f, 40f, 10f));
@@ -71,52 +73,43 @@ public class KillAura extends Module {
         this.settings.add(this.autoAnnoySetting = new BooleanSetting("Auto-Annoy", "Auto-Annoy by using Rods, Eggs or Snowballs!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Prevent sprinting while attacking!", false));
         this.settings.add(this.moveFixSetting = new BooleanSetting("MoveFix", "Legit strafing!", true));
+        this.settings.add(this.searchSetting = new BooleanSetting("Search", "Search for the best rotation!", false));
         this.settings.add(this.newHitDelaySetting = new BooleanSetting("1.9 Hit Delay", "Hit Delayed due to how newer MC Versions work!", false));
     }
 
     private EntityLivingBase getTarget() {
-        this.targetMode = (TargetMode) EnumUtil.fromName(this.targetModeSetting.getCurrentMode().getName(), TargetMode.values());
-        if (this.targetMode == null) return null;
+        SwitchMode switchMode = (SwitchMode) EnumUtil.fromName(this.switchModeSetting.getCurrentMode().getName(), SwitchMode.values());
+        if (switchMode == null) return null;
 
-        switch (this.targetMode) {
-            case SINGLE:
-                for (Entity entity : Statics.getWorld().loadedEntityList) {
-                    if (!(entity instanceof EntityLivingBase)) continue;
-                    EntityLivingBase target = (EntityLivingBase) entity;
-                    if (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(target.getName())) continue;
-                    if (Statics.getZeus().friendManager.contains(target.getName())) continue;
+        for (Entity entity : Statics.getWorld().loadedEntityList) {
+            if (entity instanceof EntityLivingBase) this.switchEntities.add((EntityLivingBase) entity);
+        }
 
-                    if (target.getDistanceToEntity(Statics.getPlayer()) <= this.dRangeSetting.getValue() && target.getHealth() >= 0 && target != Statics.getPlayer() && !(target instanceof EntityArmorStand) && !target.isInvisible()) {
-                        if (!Statics.getPlayer().canEntityBeSeen(target) && Statics.getPlayer().getUniqueID() != target.getUniqueID()) {
-                            if (target.getDistanceToEntity(Statics.getPlayer()) <= this.twRangeSetting.getValue()) {
-                                return target;
-                            }
-                        } else {
-                            return target;
-                        }
-                    }
-                }
-            case SWITCH:
-                for (Entity entity : Statics.getWorld().loadedEntityList) {
-                    if (entity instanceof EntityLivingBase) this.switchEntities.add((EntityLivingBase) entity);
-                }
-
-                this.switchEntities.removeIf(target ->
-                        this.switchEntities.size() > 0 && (
-                                target == Statics.getPlayer()
+        this.switchEntities.removeIf(target ->
+                this.switchEntities.size() > 0 && (
+                        target == Statics.getPlayer()
                                 || target.getHealth() <= 0
                                 || target.isDead
                                 || target.getDistanceToEntity(Statics.getPlayer()) > this.dRangeSetting.getValue()
                                 || target instanceof EntityArmorStand
-                                || (!Statics.getPlayer().canEntityBeSeen(target) && target.getDistanceToEntity(Statics.getPlayer()) > this.twRangeSetting.getValue()))
-                                || (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(target.getName()))
-                                || target.isInvisible()
-                                || target.getUniqueID().equals(Statics.getPlayer().getUniqueID())
-                                || Statics.getZeus().friendManager.contains(target.getName()));
+                                || ((!Statics.getPlayer().canEntityBeSeen(target) || this.searchSetting.getValue()) && target.getDistanceToEntity(Statics.getPlayer()) > this.twRangeSetting.getValue()))
+                        || (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(target.getName()))
+                        || target.isInvisible()
+                        || target.getUniqueID().equals(Statics.getPlayer().getUniqueID())
+                        || Statics.getZeus().friendManager.contains(target.getName()));
+
+        switch (switchMode) {
+            case RANGE:
                 this.switchEntities.sort((target1, target2) -> Float.compare(target1.getDistanceToEntity(Statics.getPlayer()), target2.getDistanceToEntity(Statics.getPlayer())));
-                return this.switchEntities.size() > 0 ? this.switchEntities.get(0) : null;
+                break;
+            case HEALTH:
+                this.switchEntities.sort((target1, target2) -> Float.compare(target1.getHealth(), target2.getHealth()));
+                break;
+            case ARMOR:
+                this.switchEntities.sort(Comparator.comparingInt(EntityLivingBase::getTotalArmorValue));
+                break;
         }
-        return null;
+        return this.switchEntities.size() > 0 ? this.switchEntities.get(0) : null;
     }
 
     @EventTarget
@@ -149,7 +142,25 @@ public class KillAura extends Module {
 
         this.setSuffix(this.currTarget.getName());
 
-        this.rotation.apply(this.currTarget);
+        if (this.searchSetting.getValue()) {
+            AxisAlignedBB bb = this.currTarget.getEntityBoundingBox();
+            double bestDistance = Double.MAX_VALUE;
+            Vec3 bestVec = new Vec3(0, 0, 0);
+            for (double x = bb.minX; x <= bb.maxX; x++) {
+                for (double y = bb.minY; y <= bb.maxY; y++) {
+                    for (double z = bb.minZ; z <= bb.maxZ; z++) {
+                        double dist = Statics.getPlayer().getDistance(x, y, z);
+                        if (dist < bestDistance) {
+                            bestDistance = dist;
+                            bestVec = new Vec3(x, y, z);
+                        }
+                    }
+                }
+            }
+            this.rotation.apply(bestVec);
+        } else {
+            this.rotation.apply(this.currTarget);
+        }
         if (this.moveFixSetting.getValue()) {
             EntityPlayer.movementYaw = this.rotation.getYaw();
         } else {
@@ -267,13 +278,14 @@ public class KillAura extends Module {
             this.rotation.reset();
     }
 
-    private enum TargetMode implements ModeSetting.ModeTemplate {
-        SINGLE("Single"),
-        SWITCH("Switch");
+    private enum SwitchMode implements ModeSetting.ModeTemplate {
+        RANGE("Range"),
+        HEALTH("Health"),
+        ARMOR("Armor");
 
         private final String name;
 
-        TargetMode(String name) {
+        SwitchMode(String name) {
             this.name = name;
         }
 

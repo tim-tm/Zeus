@@ -1,7 +1,9 @@
 package me.tim.util.player;
 
 import me.tim.Statics;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockEnderChest;
+import net.minecraft.block.BlockSlime;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.*;
@@ -106,18 +108,6 @@ public class InventoryUtil {
 
             if (InventoryUtil.isBlock(itemStack)) {
                 return new ItemInformation(itemStack, i);
-            }
-        }
-        return null;
-    }
-
-    public static ItemInformation searchBlocks() {
-        for (int i = 9; i < Statics.getPlayer().inventory.getSizeInventory(); i++) {
-            ItemStack stack = Statics.getPlayer().inventory.getStackInSlot(i);
-            if (stack == null) continue;
-
-            if (InventoryUtil.isBlock(stack)) {
-                return new ItemInformation(stack, i);
             }
         }
         return null;
