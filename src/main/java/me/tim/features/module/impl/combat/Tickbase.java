@@ -44,7 +44,7 @@ public class Tickbase extends Module {
         if (this.ticks <= this.maxTicksSetting.getValue() && this.cPackets > 0) {
             this.ignored = true;
             try {
-                Statics.getTimer().timerSpeed = this.ticks > 1 ? this.ticks / (this.ticks + 6f) : 1;
+                Statics.getTimer().timerSpeed = this.ticks > 1 ? 1f / (this.ticks / 2f) : 1;
                 Statics.getMinecraft().runTick();
                 this.ticks++;
             } catch (IOException ignored) {

@@ -285,8 +285,8 @@ public class Scaffold extends Module {
 
     private void syncCurrentPlayItem() {
         if (Statics.getPlayer().inventory.currentItem != this.silentSlot) {
-            Statics.sendPacket(new C09PacketHeldItemChange(this.silentSlot));
-            this.silentSlot = -1;
+            Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem));
+            this.silentSlot = Statics.getPlayer().inventory.currentItem;
         }
     }
 
