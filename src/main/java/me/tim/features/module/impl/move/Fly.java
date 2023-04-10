@@ -68,6 +68,17 @@ public class Fly extends Module {
             case COLLIDE:
                 event.setOnGround(false);
                 break;
+            case VULCANGLIDE:
+                if (!Statics.getPlayer().onGround) {
+                    if (Statics.getPlayer().ticksExisted % 9 == 0) event.setOnGround(true);
+
+                    if (Statics.getPlayer().ticksExisted % 3 == 0) {
+                        Statics.getPlayer().motionY = -0.151;
+                    }else {
+                        Statics.getPlayer().motionY = -0.10;
+                    }
+                }
+                break;
         }
     }
 
@@ -86,18 +97,21 @@ public class Fly extends Module {
             return;
         }
 
-        if (mode.equals(FlyModes.COLLIDE) || this.mode.equals(FlyModes.BLINK) || mode.equals(FlyModes.IGNORES08)) {
-            if (event.getBlock() instanceof BlockAir && event.getBlockPos().getY() < this.startData.getPosY()) {
-                event.setAxisAlignedBB(AxisAlignedBB.fromBounds(
-                        event.getBlockPos().getX(),
-                        event.getBlockPos().getY(),
-                        event.getBlockPos().getZ(),
-                        event.getBlockPos().getX() + 1,
-                        this.startData.getPosY(),
-                        event.getBlockPos().getZ() + 1
-                ));
-                Statics.speed(this.speedSetting.getValue());
-            }
+        switch (this.mode) {
+            case COLLIDE:
+            case BLINK:
+            case IGNORES08:
+                if (event.getBlock() instanceof BlockAir && event.getBlockPos().getY() < this.startData.getPosY()) {
+                    event.setAxisAlignedBB(AxisAlignedBB.fromBounds(
+                            event.getBlockPos().getX(),
+                            event.getBlockPos().getY(),
+                            event.getBlockPos().getZ(),
+                            event.getBlockPos().getX() + 1,
+                            this.startData.getPosY(),
+                            event.getBlockPos().getZ() + 1
+                    ));
+                }
+                break;
         }
     }
 
@@ -160,7 +174,8 @@ public class Fly extends Module {
         COLLIDE("Collide"),
         BLINK("Blink"),
         PACKET("Packet"),
-        IGNORES08("IgnoreS08");
+        IGNORES08("IgnoreS08"),
+        VULCANGLIDE("VulcanGlide");
 
         private final String name;
 

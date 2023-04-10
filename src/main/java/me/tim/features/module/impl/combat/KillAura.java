@@ -92,7 +92,7 @@ public class KillAura extends Module {
                                 || target.isDead
                                 || target.getDistanceToEntity(Statics.getPlayer()) > this.dRangeSetting.getValue()
                                 || target instanceof EntityArmorStand
-                                || ((!Statics.getPlayer().canEntityBeSeen(target) || this.searchSetting.getValue()) && target.getDistanceToEntity(Statics.getPlayer()) > this.twRangeSetting.getValue()))
+                                || (!Statics.getPlayer().canEntityBeSeen(target) && !this.searchSetting.getValue() && target.getDistanceToEntity(Statics.getPlayer()) > this.twRangeSetting.getValue()))
                         || (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(target.getName()))
                         || target.isInvisible()
                         || target.getUniqueID().equals(Statics.getPlayer().getUniqueID())

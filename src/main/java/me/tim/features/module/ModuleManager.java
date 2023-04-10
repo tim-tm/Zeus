@@ -8,10 +8,7 @@ import me.tim.features.module.impl.exploit.Blink;
 import me.tim.features.module.impl.exploit.FastPlace;
 import me.tim.features.module.impl.exploit.Phase;
 import me.tim.features.module.impl.move.*;
-import me.tim.features.module.impl.player.Cleaner;
-import me.tim.features.module.impl.player.FastBridge;
-import me.tim.features.module.impl.player.Stealer;
-import me.tim.features.module.impl.player.Teams;
+import me.tim.features.module.impl.player.*;
 import me.tim.features.module.impl.render.*;
 
 import java.util.ArrayList;

@@ -11,6 +11,8 @@ import me.tim.util.common.EnumUtil;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import org.lwjgl.input.Keyboard;
 
+import javax.vecmath.Vector2f;
+
 public class NoSlow extends Module {
     private ModeSetting modeSetting;
 
@@ -42,10 +44,7 @@ public class NoSlow extends Module {
                 Statics.sendPacket(new C08PacketPlayerBlockPlacement(Statics.getPlayer().getCurrentEquippedItem()));
                 break;
             case GRIM:
-                if (Statics.getPlayer().ticksExisted % 2 == 0) {
-                    event.setCancelled(true);
-                    Statics.sendPacket(new C08PacketPlayerBlockPlacement(Statics.getPlayer().getCurrentEquippedItem()));
-                }
+                event.setMultiplier(new Vector2f(0.4f, 0.4f));
                 break;
         }
     }
