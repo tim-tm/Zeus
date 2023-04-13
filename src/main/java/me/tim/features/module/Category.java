@@ -5,5 +5,6 @@ public enum Category {
     MOVEMENT,
     PLAYER,
     RENDER,
-    EXPLOIT;
+    EXPLOIT,
+    SCRIPT
 }
