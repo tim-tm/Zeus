@@ -1365,6 +1365,34 @@ public abstract class Entity implements ICommandSender
     }
 
     /**
+     * Returns the distance to the entity. Args: entity
+     */
+    public float getDistanceToEntityXZ(Entity entityIn)
+    {
+        float f = (float)(this.posX - entityIn.posX);
+        float f2 = (float)(this.posZ - entityIn.posZ);
+        return MathHelper.sqrt_float(f * f + f2 * f2);
+    }
+
+    /**
+     * Returns the distance to the entity. Args: entity
+     */
+    public float getDistanceToEntityX(Entity entityIn)
+    {
+        float f = (float)(this.posX - entityIn.posX);
+        return MathHelper.sqrt_float(f * f);
+    }
+
+    /**
+     * Returns the distance to the entity. Args: entity
+     */
+    public float getDistanceToEntityZ(Entity entityIn)
+    {
+        float f = (float)(this.posZ - entityIn.posZ);
+        return MathHelper.sqrt_float(f * f);
+    }
+
+    /**
      * Gets the squared distance to the position. Args: x, y, z
      */
     public double getDistanceSq(double x, double y, double z)

@@ -43,6 +43,8 @@ public class ModuleManager {
         this.modules.add(new ESP());
         this.modules.add(new TargetHUD());
         this.modules.add(new NoCameraClip());
+        this.modules.add(new MotionGraph());
+        this.modules.add(new Radar());
     }
 
     public ArrayList<Module> getModules() {

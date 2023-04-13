@@ -3,14 +3,15 @@ package me.tim.util.render.shader;
 import me.tim.Statics;
 import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.impl.BloomShader;
+import me.tim.util.render.shader.impl.CircleShader;
 import me.tim.util.render.shader.impl.RoundedRectShader;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.src.Config;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -21,7 +22,6 @@ import net.optifine.shaders.Shaders;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import tv.twitch.broadcast.FrameBuffer;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;
@@ -30,11 +30,14 @@ import java.nio.FloatBuffer;
 public class RenderUtil {
     private static final RoundedRectShader ROUNDED_RECT_SHADER = new RoundedRectShader();
     private static final BloomShader BLOOM_SHADER = new BloomShader();
+    private static final CircleShader CIRCLE_SHADER = new CircleShader();
+
     private static Framebuffer BLOOM_FRAMEBUFFER = new Framebuffer(1, 1, false);
 
     static {
         ROUNDED_RECT_SHADER.setup();
         BLOOM_SHADER.setup();
+        CIRCLE_SHADER.setup();
     }
 
     public static void drawRoundedRect(float x, float y, float x2, float y2, float radius, Color color) {
@@ -46,6 +49,17 @@ public class RenderUtil {
         ROUNDED_RECT_SHADER.use();
         ROUNDED_RECT_SHADER.drawQuads(x - 1, y - 1, x2 - x + 2, y2 - y + 2);
         ROUNDED_RECT_SHADER.stop();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawCircle(float x, float y, float x2, float y2, Color color) {
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        CIRCLE_SHADER.setSize(new Vector2f(x2 - x, y2 - y));
+        CIRCLE_SHADER.setColor(color);
+        CIRCLE_SHADER.use();
+        CIRCLE_SHADER.drawQuads(x - 1, y - 1, x2 - x + 2, y2 - y + 2);
+        CIRCLE_SHADER.stop();
         GlStateManager.disableBlend();
     }
 

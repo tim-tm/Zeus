@@ -113,6 +113,10 @@ public class Statics {
         }
     }
 
+    public static double getSpeed() {
+        return Math.hypot(Statics.getPlayer().motionX, Statics.getPlayer().motionZ);
+    }
+
     public static void sendPacket(Packet<?> packet) {
         Statics.getPlayer().sendQueue.addToSendQueue(packet);
     }
