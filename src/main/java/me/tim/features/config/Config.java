@@ -85,7 +85,6 @@ public class Config {
 
             this.gson.toJson(finalObj, writer);
             writer.flush();
-            writer.close();
         } catch (IOException e) {
             System.err.printf("Failed to save config: %s | %s%n", this.name, this.file.getAbsolutePath());
             e.printStackTrace();

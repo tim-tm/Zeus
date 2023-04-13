@@ -9,11 +9,11 @@ import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.friend.FriendManager;
 import me.tim.features.module.ModuleManager;
+import me.tim.features.script.ScriptManager;
 import me.tim.ui.ZeusIngame;
 import me.tim.ui.click.ClickGUI;
 import me.tim.ui.notify.Notification;
 import me.tim.ui.notify.NotificationRenderer;
-import me.tim.util.SessionUtil;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
@@ -37,6 +37,7 @@ public class Zeus {
     public CommandManager commandManager;
     public ConfigManager configManager;
     public FriendManager friendManager;
+    public ScriptManager scriptManager;
 
     private final IntegrationManager integrationManager;
     private final ExploitPrevention exploitPrevention;
@@ -49,6 +50,7 @@ public class Zeus {
         this.commandManager = new CommandManager();
         this.configManager = new ConfigManager();
         this.friendManager = new FriendManager();
+        this.scriptManager = new ScriptManager();
 
         this.integrationManager = new IntegrationManager();
         this.exploitPrevention = new ExploitPrevention();
