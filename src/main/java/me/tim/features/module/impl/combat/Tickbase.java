@@ -7,7 +7,6 @@ import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.NumberSetting;
-import me.tim.util.Timer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import org.lwjgl.input.Keyboard;
 
@@ -18,16 +17,14 @@ public class Tickbase extends Module {
 
     private int ticks, cPackets;
     private boolean ignored;
-    private final Timer timer;
 
     public Tickbase() {
         super("Tickbase", "Tick-manipulation lets you teleport!", Keyboard.KEY_NONE, Category.COMBAT);
-        this.timer = new Timer();
     }
 
     @Override
     protected void setupSettings() {
-        this.settings.add(this.maxTicksSetting = new NumberSetting("Max-Ticks", "Max-Ticks", 1, 30, 3));
+        this.settings.add(this.maxTicksSetting = new NumberSetting("Max-Ticks", "Max-Ticks", 1, 10, 3));
     }
 
     @EventTarget

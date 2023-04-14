@@ -28,6 +28,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 import viamcp.ViaMCP;
@@ -37,7 +38,7 @@ import java.util.Comparator;
 
 public class KillAura extends Module {
     private ModeSetting switchModeSetting, autoBlockModeSetting;
-    private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting, maxHurtTimeSetting, particleMultiplierSetting;
+    private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting, maxHurtTimeSetting, particleMultiplierSetting, reduceSetting;
     private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting, searchSetting;
 
     private final Rotation rotation;
@@ -69,6 +70,7 @@ public class KillAura extends Module {
         this.settings.add(this.switchDelaySetting = new NumberSetting("Switch Delay", "Delay between switching targets!", 0, 500, 125));
         this.settings.add(this.maxHurtTimeSetting = new NumberSetting("Max-HurtTime", "Maximum HurtTime of Target!", 1, 10, 10));
         this.settings.add(this.particleMultiplierSetting = new NumberSetting("ParticleMultiplier", "See more particles!", 1, 10, 2));
+        this.settings.add(this.reduceSetting = new NumberSetting("Reduce-Amount", "Amount of reduction!", 1, 10, 2));
 
         this.settings.add(this.autoAnnoySetting = new BooleanSetting("Auto-Annoy", "Auto-Annoy by using Rods, Eggs or Snowballs!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Prevent sprinting while attacking!", false));
@@ -196,6 +198,7 @@ public class KillAura extends Module {
                 }
 
                 if (!this.keepSprintSetting.getValue() && Statics.getPlayer().isSprinting()) {
+                    this.currTarget.addVelocity(-MathHelper.sin(this.rotation.getYaw() * (float)Math.PI / 180.0F) * this.reduceSetting.getValue() * 0.5F, 0.1D, MathHelper.cos(this.rotation.getYaw() * (float)Math.PI / 180.0F) * this.reduceSetting.getValue() * 0.5F);
                     Statics.getPlayer().motionZ *= 0.6f;
                     Statics.getPlayer().motionX *= 0.6f;
                     Statics.getPlayer().setSprinting(false);
