@@ -11,6 +11,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.util.*;
 
+import java.util.UUID;
+
 public class Statics {
     private static double speed = 0.265f;
 
@@ -115,6 +117,20 @@ public class Statics {
 
     public static double getSpeed() {
         return Math.hypot(Statics.getPlayer().motionX, Statics.getPlayer().motionZ);
+    }
+
+    public static double getBPS() {
+        double delta = MathHelper.sqrt_double(getPlayer().motionX * getPlayer().motionX + getPlayer().motionZ * getPlayer().motionZ);
+        return delta * 20 * getTimer().timerSpeed;
+    }
+
+    public static int getPing(UUID player) {
+        if (getMinecraft().isIntegratedServerRunning()) return 0;
+        return getMinecraft().getNetHandler().getPlayerInfo(player).getResponseTime();
+    }
+
+    public static int getPing() {
+        return getPing(getPlayer().getUniqueID());
     }
 
     public static void sendPacket(Packet<?> packet) {

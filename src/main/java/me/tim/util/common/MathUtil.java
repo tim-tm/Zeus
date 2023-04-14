@@ -1,5 +1,8 @@
 package me.tim.util.common;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class MathUtil {
     public static Double random(float min, float max) {
         return min + (max - min) * Math.random();
@@ -16,5 +19,10 @@ public class MathUtil {
 
     public static Float percentage(float value, float maxValue) {
         return value / maxValue;
+    }
+
+    public static Double round(double value, int places) {
+        BigDecimal bigDecimal = new BigDecimal(value).setScale(places, RoundingMode.HALF_EVEN);
+        return bigDecimal.doubleValue();
     }
 }

@@ -1,6 +1,7 @@
 package net.minecraft.client.renderer;
 
 import me.tim.Statics;
+import me.tim.features.event.EventRenderItem;
 import me.tim.features.module.impl.combat.KillAura;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -384,8 +385,12 @@ public class ItemRenderer
             {
                 KillAura killAura = (KillAura) Statics.getZeus().moduleManager.getModuleByClass(KillAura.class);
                 if (killAura.isEnabled() && killAura.getBlockMode().equals(KillAura.BlockMode.FAKE) && killAura.getCurrTarget() != null) {
-                    this.transformFirstPersonItem(f, 0.0F);
-                    this.doBlockTransformations();
+                    EventRenderItem eventRenderItem = new EventRenderItem(f, f1);
+                    eventRenderItem.call();
+                    if (!eventRenderItem.isCancelled()) {
+                        this.transformFirstPersonItem(eventRenderItem.getF(), 0.0F);
+                        this.doBlockTransformations();
+                    }
                 }
                 else if (this.itemToRender.getItem() instanceof ItemMap)
                 {
@@ -408,10 +413,13 @@ public class ItemRenderer
                             break;
 
                         case BLOCK:
-                            this.transformFirstPersonItem(f, 0.0F);
-                            this.doBlockTransformations();
+                            EventRenderItem eventRenderItem = new EventRenderItem(f, f1);
+                            eventRenderItem.call();
+                            if (!eventRenderItem.isCancelled()) {
+                                this.transformFirstPersonItem(eventRenderItem.getF(), 0.0F);
+                                this.doBlockTransformations();
+                            }
                             break;
-
                         case BOW:
                             this.transformFirstPersonItem(f, 0.0F);
                             this.doBowTransformations(partialTicks, abstractclientplayer);

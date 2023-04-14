@@ -65,9 +65,6 @@ public class Fly extends Module {
                     this.startData.sendPacket(false);
                 }
                 break;
-            case COLLIDE:
-                event.setOnGround(false);
-                break;
             case VULCANGLIDE:
                 if (!Statics.getPlayer().onGround) {
                     if (Statics.getPlayer().ticksExisted % 9 == 0) event.setOnGround(true);

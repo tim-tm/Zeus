@@ -6,10 +6,8 @@ import me.tim.features.event.EventRender2D;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Module;
-import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.shader.Framebuffer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class ZeusIngame {
         Statics.getFontRenderer().drawString(String.valueOf(Minecraft.getDebugFPS()), 12 + Statics.getFontRenderer().getStringWidth("FPS: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT * 2 - 6, -1);
 
         Statics.getFontRenderer().drawString("Ping: ", 10, event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT - 3, new Color(205, 75, 205).getRGB());
-        Statics.getFontRenderer().drawString(String.valueOf(Statics.getMinecraft().getCurrentServerData().pingToServer), 12 + Statics.getFontRenderer().getStringWidth("Ping: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT - 3, -1);
+        Statics.getFontRenderer().drawString(String.valueOf(Statics.getPing()), 12 + Statics.getFontRenderer().getStringWidth("Ping: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT - 3, -1);
     }
 
     @EventTarget

@@ -18,10 +18,10 @@ public class ModuleManager {
 
     public ModuleManager() {
         this.modules = new ArrayList<>();
+        this.modules.add(new Backtrack());
         this.modules.add(new KillAura());
         this.modules.add(new Velocity());
         this.modules.add(new Tickbase());
-        this.modules.add(new Backtrack());
 
         this.modules.add(new Fly());
         this.modules.add(new NoSlow());
@@ -29,22 +29,24 @@ public class ModuleManager {
         this.modules.add(new Step());
         this.modules.add(new Speed());
 
-        this.modules.add(new Stealer());
         this.modules.add(new Cleaner());
         this.modules.add(new FastBridge());
+        this.modules.add(new Stealer());
         this.modules.add(new Teams());
 
-        this.modules.add(new Phase());
-        this.modules.add(new FastPlace());
         this.modules.add(new Blink());
+        this.modules.add(new FastPlace());
+        this.modules.add(new Phase());
 
+        this.modules.add(new Animation());
         this.modules.add(new ClickGUI());
-        this.modules.add(new Fullbright());
         this.modules.add(new ESP());
-        this.modules.add(new TargetHUD());
-        this.modules.add(new NoCameraClip());
+        this.modules.add(new Fullbright());
         this.modules.add(new MotionGraph());
+        this.modules.add(new NoCameraClip());
+        this.modules.add(new PingGraph());
         this.modules.add(new Radar());
+        this.modules.add(new TargetHUD());
     }
 
     public ArrayList<Module> getModules() {
