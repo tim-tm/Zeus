@@ -77,7 +77,7 @@ public class Backtrack extends Module {
 
     @EventTarget
     private void onPacket(EventPacket eventPacket) {
-        if (this.entityInformation == null) return;
+        if (Statics.getWorld() == null || this.entityInformation == null) return;
 
         switch (eventPacket.getState()) {
             case SEND:
@@ -90,6 +90,8 @@ public class Backtrack extends Module {
             case RECEIVE:
                 if (eventPacket.getPacket() instanceof S14PacketEntity) {
                     S14PacketEntity packetEntity = (S14PacketEntity) eventPacket.getPacket();
+                    if (packetEntity == null) return;
+
                     Entity entity = packetEntity.getEntity(Statics.getWorld());
                     if (this.entityInformation.hit && entity != null && entity.equals(this.entityInformation.entity)) {
                         if (!this.timer.elapsed((long) this.delaySetting.getValue())) {

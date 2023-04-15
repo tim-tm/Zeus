@@ -45,7 +45,7 @@ public class Radar extends Module {
             rotX = MathHelper.clamp_float(rotX, -size / 2f, size / 2f);
 
             Color color = new Color(215, 35, 45);
-            if (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(playerEntity.getName())) {
+            if ((this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(playerEntity.getName())) || Statics.getZeus().friendManager.contains(playerEntity.getName())) {
                 color = new Color(45, 35, 215);
             }
             RenderUtil.drawCircle(eventRender2D.getWidth() - 16 - (size / 2f + rotX), eventRender2D.getHeight() - 16 - (size / 2f + rotY), eventRender2D.getWidth() - 14 - (size / 2f + rotX), eventRender2D.getHeight() - 14 - (size / 2f + rotY), color);

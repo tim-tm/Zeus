@@ -33,7 +33,7 @@ public class Panel implements CUIComponent {
         int index = 1;
         for (Module module : Statics.getZeus().moduleManager.getModules()) {
             if (module.getCategory().equals(category)) {
-                this.moduleButtons.add(new ModuleButton(module, new Vector2f(this.position.x + 3, this.position.y + (index*(this.size.y + 1))), new Vector2f(this.size.x - 6, this.size.y)));
+                this.moduleButtons.add(new ModuleButton(module, new Vector2f(this.position.x, this.position.y + (index*this.size.y)), new Vector2f(this.size.x, this.size.y)));
                 index++;
             }
         }
@@ -41,7 +41,7 @@ public class Panel implements CUIComponent {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        RenderUtil.drawRoundedRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, 5f, new Color(35, 35, 35, 215));
+        RenderUtil.drawRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, new Color(20, 20, 20, 255));
         String pnlName = StringUtils.capitalize(this.category.name().toLowerCase());
         Statics.getFontRenderer().drawString(pnlName, (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(pnlName) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2), -1);
 
@@ -54,7 +54,7 @@ public class Panel implements CUIComponent {
         int index = 1;
         float offset = 0;
         for (ModuleButton module : this.moduleButtons) {
-            module.setPosition(new Vector2f(this.position.x + 3, this.position.y + (index*(this.size.y + 1) + offset)));
+            module.setPosition(new Vector2f(this.position.x, this.position.y + (index*this.size.y + offset)));
             module.drawScreen(mouseX, mouseY, partialTicks);
             offset += module.offset;
             index++;

@@ -24,6 +24,7 @@ public class ModuleManager {
         this.modules.add(new Tickbase());
 
         this.modules.add(new Fly());
+        this.modules.add(new LongJump());
         this.modules.add(new NoSlow());
         this.modules.add(new Scaffold());
         this.modules.add(new Step());

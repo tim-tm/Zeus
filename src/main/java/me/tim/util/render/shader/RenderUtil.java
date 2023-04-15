@@ -7,9 +7,8 @@ import me.tim.util.render.shader.impl.CircleShader;
 import me.tim.util.render.shader.impl.RoundedRectShader;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.src.Config;
@@ -60,6 +59,37 @@ public class RenderUtil {
         CIRCLE_SHADER.use();
         CIRCLE_SHADER.drawQuads(x - 1, y - 1, x2 - x + 2, y2 - y + 2);
         CIRCLE_SHADER.stop();
+        GlStateManager.disableBlend();
+    }
+    
+    public static void drawRect(float x, float y, float x2, float y2, Color color) {
+        if (x < x2)
+        {
+            float i = x;
+            x = x2;
+            x2 = i;
+        }
+
+        if (y < y2)
+        {
+            float j = y;
+            y = y2;
+            y2 = j;
+        }
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(color.getRed() / 255.f, color.getGreen() / 255.f, color.getBlue() / 255.f, color.getAlpha() / 255.f);
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION);
+        worldrenderer.pos(x, y2, 0.0D).endVertex();
+        worldrenderer.pos(x2, y2, 0.0D).endVertex();
+        worldrenderer.pos(x2, y, 0.0D).endVertex();
+        worldrenderer.pos(x, y, 0.0D).endVertex();
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
     }
 

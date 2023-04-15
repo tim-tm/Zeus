@@ -61,11 +61,38 @@ public class Statics {
     }
 
     public static void speed(float d) {
-        float yaw = EntityPlayer.movementYaw != null ? EntityPlayer.movementYaw : getPlayer().rotationYaw;
-        yaw = (float) Math.toRadians(yaw);
-        Statics.speed = d;
-        getPlayer().motionX = -MathHelper.sin(yaw) * d;
-        getPlayer().motionZ = MathHelper.cos(yaw) * d;
+        double yaw = EntityPlayer.movementYaw != null ? EntityPlayer.movementYaw : getPlayer().rotationYaw;
+        boolean moving = !(getPlayer().moveForward == 0.0F && getPlayer().moveStrafing == 0.0F);
+        boolean movingForward = getPlayer().moveForward > 0.0F;
+        boolean movingBackward = getPlayer().moveForward < 0.0F;
+        boolean movingRight = getPlayer().moveStrafing > 0.0F;
+        boolean movingLeft = getPlayer().moveStrafing < 0.0F;
+        boolean movingSideways = !(!movingLeft && !movingRight);
+        boolean movingStraight = !(!movingForward && !movingBackward);
+        if (moving) {
+            if (movingForward && !movingSideways) {
+                yaw += 0.0D;
+            } else if (movingBackward && !movingSideways) {
+                yaw += 180.0D;
+            } else if (movingForward && movingLeft) {
+                yaw += 45.0D;
+            } else if (movingForward) {
+                yaw -= 45.0D;
+            } else if (!movingStraight && movingLeft) {
+                yaw += 90.0D;
+            } else if (!movingStraight && movingRight) {
+                yaw -= 90.0D;
+            } else if (movingBackward && movingLeft) {
+                yaw += 135.0D;
+            } else if (movingBackward) {
+                yaw -= 135.0D;
+            }
+
+            yaw = Math.toRadians(yaw);
+            Statics.speed = d;
+            getPlayer().motionX = -MathHelper.sin((float) yaw) * d;
+            getPlayer().motionZ = MathHelper.cos((float) yaw) * d;
+        }
     }
 
     public static void motionFly(EventMove event, boolean yChange, double speed) {
@@ -125,8 +152,14 @@ public class Statics {
     }
 
     public static int getPing(UUID player) {
+        if (getMinecraft() == null) return 0;
         if (getMinecraft().isIntegratedServerRunning()) return 0;
+        if (getMinecraft().getNetHandler() == null || getMinecraft().getNetHandler().getPlayerInfo(player) == null) return 0;
         return getMinecraft().getNetHandler().getPlayerInfo(player).getResponseTime();
+    }
+
+    public static double getCacheSpeed() {
+        return speed;
     }
 
     public static int getPing() {

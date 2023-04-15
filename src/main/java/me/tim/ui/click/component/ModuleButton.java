@@ -8,9 +8,7 @@ import me.tim.ui.click.settings.impl.ColorSetting;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.render.shader.RenderUtil;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
-import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;
@@ -33,13 +31,13 @@ public class ModuleButton implements CUIComponent {
     private void drawSetting(Setting setting, int mouseX, int mouseY) {
         if (setting instanceof ModeSetting) {
             ModeSetting modeSetting = (ModeSetting) setting;
-            RenderUtil.drawRoundedRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, 1f, new Color(35, 35, 35, 215));
+            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, new Color(35, 35, 35, 215));
             Statics.getFontRenderer().drawString(setting.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(setting.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + this.offset + this.size.y), -1);
 
             if (modeSetting.isExtended()) {
                 float offset = this.offset + this.size.y * 2;
                 for (ModeSetting.ModeTemplate mode : modeSetting.getModes()) {
-                    RenderUtil.drawRoundedRect(this.position.x, this.position.y + offset, this.position.x + this.size.x, this.position.y + this.size.y + offset, 1f, mode.equals(modeSetting.getCurrentMode()) ? new Color(200, 25, 200, 215) : new Color(35, 35, 35, 215));
+                    RenderUtil.drawRect(this.position.x, this.position.y + offset, this.position.x + this.size.x, this.position.y + this.size.y + offset, mode.equals(modeSetting.getCurrentMode()) ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
                     Statics.getFontRenderer().drawString(mode.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(mode.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset), -1);
                     offset += this.size.y;
                 }
@@ -49,7 +47,7 @@ public class ModuleButton implements CUIComponent {
 
         if (setting instanceof NumberSetting) {
             NumberSetting numberSetting = (NumberSetting) setting;
-            RenderUtil.drawRoundedRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, 1f, new Color(35, 35, 35, 215));
+            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, new Color(35, 35, 35, 215));
 
             String settingName = setting.getName();
             if (numberSetting.isDragging()) {
@@ -58,7 +56,7 @@ public class ModuleButton implements CUIComponent {
                 numberSetting.setValue(val);
 
                 float factor = numberSetting.getValue() / numberSetting.getMaxValue();
-                RenderUtil.drawRoundedRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + (this.size.x * factor), this.position.y + this.size.y * 2 + this.offset, 1f, new Color(200, 25, 200, 215));
+                RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + (this.size.x * factor), this.position.y + this.size.y * 2 + this.offset, new Color(200, 25, 200, 255));
                 settingName = String.valueOf(Math.round(numberSetting.getValue() * 100D) / 100D);
             }
 
@@ -71,7 +69,7 @@ public class ModuleButton implements CUIComponent {
 
         if (setting instanceof BooleanSetting) {
             BooleanSetting booleanSetting = (BooleanSetting) setting;
-            RenderUtil.drawRoundedRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, 1f, booleanSetting.getValue() ? new Color(200, 25, 200, 215) : new Color(35, 35, 35, 215));
+            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, booleanSetting.getValue() ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
             Statics.getFontRenderer().drawString(setting.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(setting.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + this.offset + this.size.y), -1);
         }
 
@@ -86,7 +84,7 @@ public class ModuleButton implements CUIComponent {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        RenderUtil.drawRoundedRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, 1f, this.module.isEnabled() ? new Color(200, 25, 200, 215) : new Color(35, 35, 35, 215));
+        RenderUtil.drawRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, this.module.isEnabled() ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
         Statics.getFontRenderer().drawString(module.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(module.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2), -1);
 
         if (this.extended && !this.module.getSettings().isEmpty()) {
@@ -116,7 +114,7 @@ public class ModuleButton implements CUIComponent {
         }
 
         if (!this.extended) return;
-        int index = 1, mIndex = 0;
+        int index = 1;
         for (Setting setting : this.module.getSettings()) {
             if (!setting.isVisible()) continue;
 

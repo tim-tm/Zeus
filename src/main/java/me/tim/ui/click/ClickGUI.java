@@ -31,7 +31,7 @@ public class ClickGUI extends GuiScreen {
             component.drawScreen(mouseX, mouseY, partialTicks);
         }
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 1);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 2);
 
         for (CUIComponent component : this.components) {
             component.drawScreen(mouseX, mouseY, partialTicks);
