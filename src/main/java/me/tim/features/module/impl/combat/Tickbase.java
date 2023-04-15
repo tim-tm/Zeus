@@ -8,6 +8,7 @@ import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -41,11 +42,13 @@ public class Tickbase extends Module {
         if (this.ticks <= this.maxTicksSetting.getValue() && this.cPackets > 0) {
             this.ignored = true;
             try {
-                Statics.getTimer().timerSpeed = this.ticks > 1 ? 1f / (this.ticks / 2f) : 1;
+                float speed = 1f / (this.ticks / 2f);
+                speed = MathHelper.clamp_float(speed, 0.05f, 1);
+
+                Statics.getTimer().timerSpeed = this.ticks > 1 ?  speed : 1;
                 Statics.getMinecraft().runTick();
                 this.ticks++;
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) { }
             this.ignored = false;
         } else {
             this.ticks = 0;

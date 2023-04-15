@@ -198,7 +198,7 @@ public class KillAura extends Module {
                 }
 
                 if (!this.keepSprintSetting.getValue() && Statics.getPlayer().isSprinting()) {
-                    this.currTarget.addVelocity(-MathHelper.sin(this.rotation.getYaw() * (float)Math.PI / 180.0F) * this.reduceSetting.getValue() * 0.5F, 0.1D, MathHelper.cos(this.rotation.getYaw() * (float)Math.PI / 180.0F) * this.reduceSetting.getValue() * 0.5F);
+                    this.currTarget.addVelocity(-MathHelper.sin((float) Math.toRadians(this.rotation.getYaw())) * this.reduceSetting.getValue() * 0.5F, 0.1D, MathHelper.cos((float) Math.toRadians(this.rotation.getYaw())) * this.reduceSetting.getValue() * 0.5F);
                     Statics.getPlayer().motionZ *= 0.6f;
                     Statics.getPlayer().motionX *= 0.6f;
                     Statics.getPlayer().setSprinting(false);

@@ -7,7 +7,8 @@ public class Event {
         final ArrayList<EventData> data = EventManager.get(this.getClass());
 
         if (data != null) {
-            for (EventData datum : data) {
+            for (int i = 0; i < data.size(); i++) {
+                EventData datum = data.get(i);
                 try {
                     datum.target.invoke(datum.source, this);
                 } catch (Exception e) {
