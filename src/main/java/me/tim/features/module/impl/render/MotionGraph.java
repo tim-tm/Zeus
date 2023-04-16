@@ -2,8 +2,8 @@ package me.tim.features.module.impl.render;
 
 import me.tim.Statics;
 import me.tim.features.event.EventBloom;
+import me.tim.features.event.EventPreMotion;
 import me.tim.features.event.EventRender2D;
-import me.tim.features.event.EventTick;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
@@ -28,7 +28,7 @@ public class MotionGraph extends Module {
     protected void setupSettings() { }
 
     @EventTarget
-    private void onTick(EventTick eventTick) {
+    private void onPre(EventPreMotion eventPreMotion) {
         if (Statics.getWorld() == null) return;
         if (this.speeds.size() > this.width) {
             this.speeds.remove(0);
