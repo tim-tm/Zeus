@@ -4,6 +4,7 @@ uniform sampler2D inTexture, textureToCheck;
 uniform vec2 texelSize, direction;
 uniform float radius;
 uniform float weights[256];
+uniform vec3 color;
 
 #define offset texelSize * direction
 
@@ -16,5 +17,5 @@ void main() {
         blr += texture2D(inTexture, gl_TexCoord[0].st - f * offset).a * (weights[int(abs(f))]);
     }
 
-    gl_FragColor = vec4(0.0, 0.0, 0.0, blr);
+    gl_FragColor = vec4(color.xyz, blr);
 }
