@@ -153,10 +153,6 @@ public class Scaffold extends Module {
     private void onTick(EventTick event) {
         if (this.blockUtil == null || this.blockUtil.getPos() == null || this.rotation == null) return;
 
-        if (Statics.getPlayer().isSprinting() && !this.keepSprintSetting.getValue() && (this.rotation.getYaw() != Statics.getPlayer().rotationYaw && this.rotation.getPitch() != Statics.getPlayer().rotationPitch)) {
-            Statics.getPlayer().setSprinting(false);
-        }
-
         int slot = this.silentSetting.getValue() ? this.silentSlot : Statics.getPlayer().inventory.currentItem;
         ItemStack item = Statics.getPlayer().inventory.getStackInSlot(slot);
         boolean check = item != null
@@ -184,7 +180,12 @@ public class Scaffold extends Module {
         final int dif = (int) ((MathHelper.wrapAngleTo180_float(Statics.getPlayer().rotationYaw - this.rotation.getYaw() - 23.5F - 135.0F) + 180.0F) / 45.0F);
         final float strafe = eventStrafe.getStrafe();
         final float forward = eventStrafe.getForward();
-        final float friction = eventStrafe.getFriction();
+        float friction = eventStrafe.getFriction();
+
+        if (Statics.getPlayer().isSprinting() && !this.keepSprintSetting.getValue()) {
+            Statics.getPlayer().setSprinting(false);
+            friction = Statics.getPlayer().onGround ? 0.09999999f : 0.02f;
+        }
 
         float calcForward = 0.0F;
         float calcStrafe = 0.0F;
