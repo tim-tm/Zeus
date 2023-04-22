@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.shader.Framebuffer;
 
 import javax.vecmath.Vector2f;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -31,7 +32,7 @@ public class ClickGUI extends GuiScreen {
             component.drawScreen(mouseX, mouseY, partialTicks);
         }
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 2);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 2, new Color(190, 35, 190));
 
         for (CUIComponent component : this.components) {
             component.drawScreen(mouseX, mouseY, partialTicks);

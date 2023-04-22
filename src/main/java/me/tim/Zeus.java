@@ -14,18 +14,21 @@ import me.tim.ui.ZeusIngame;
 import me.tim.ui.click.ClickGUI;
 import me.tim.ui.notify.Notification;
 import me.tim.ui.notify.NotificationRenderer;
+import me.tim.util.common.FileUtil;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
 import net.minecraft.network.play.server.S48PacketResourcePackSend;
+import net.minecraft.util.ResourceLocation;
 import viamcp.ViaMCP;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Zeus {
     public static final String VERSION = "v0.4";
@@ -88,9 +91,25 @@ public class Zeus {
         }
 
         private static final class DiscordIntegration implements Integration {
-            private static final String APPLICATION_ID = "1091987010975186945";
+            private static String APPLICATION_ID;
 
             public DiscordIntegration() {
+                File tokenFile = new File(FileUtil.getRealPath(new ResourceLocation("zeus/.tokens")));
+                if (tokenFile.exists()) {
+                    try (Scanner scanner = new Scanner(tokenFile)) {
+                        String line;
+                        while (scanner.hasNextLine()) {
+                            line = scanner.nextLine();
+                            String[] split = line.split(":");
+                            if (split.length > 1 && split[0].equals("DISCORD_APP")) {
+                                APPLICATION_ID = split[1];
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 DiscordEventHandlers handlers = new DiscordEventHandlers.Builder().setReadyEventHandler((user) -> {
                     System.out.printf("Discord RPC successfully setup. User: %s:%s%n", user.username, user.discriminator);
                 }).build();

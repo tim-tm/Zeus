@@ -46,6 +46,7 @@ public class ZeusIngame {
             String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
             int height = Statics.getFontRenderer().FONT_HEIGHT;
             int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName() + suffix);
+
             Gui.drawRect(x - 2, y - 2, x + width, y + height, new Color(255, 255, 255).getRGB());
             index++;
         }

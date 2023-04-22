@@ -3,6 +3,8 @@ package net.minecraft.client.gui;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -144,10 +146,11 @@ public class GuiIngame extends Gui
         bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
-        new EventBloom(i, j).call();
+        EventBloom bloomEv = new EventBloom(new Color(0, 0, 0), i, j);
+        bloomEv.call();
         this.render(scaledresolution, i, j, partialTicks, false);
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2, bloomEv.getBloomColor());
 
         new EventRender2D(i, j, partialTicks).call();
 

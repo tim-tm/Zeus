@@ -103,7 +103,7 @@ public class RenderUtil {
         return framebuffer;
     }
 
-    public static void drawBloom(int sourceTexture, int radius, int offset) {
+    public static void drawBloom(int sourceTexture, int radius, int offset, Color color) {
         BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(BLOOM_FRAMEBUFFER);
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.0f);
@@ -125,6 +125,7 @@ public class RenderUtil {
         BLOOM_SHADER.setRadius(radius);
         BLOOM_SHADER.setDirection(new Vector2f(offset, 0));
         BLOOM_SHADER.setWeights(weights);
+        BLOOM_SHADER.setColor(color);
         BLOOM_SHADER.use();
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, sourceTexture);
