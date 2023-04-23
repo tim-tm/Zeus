@@ -20,20 +20,22 @@ public class ModeSetting extends Setting {
 
     @Override
     public float draw(Vector2f position, Vector2f size, float offset, int mouseX, int mouseY) {
-        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35, 215));
+        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35));
         Statics.getFontRenderer().drawString(this.getName(), (int) (position.x + size.x / 2 - Statics.getFontRenderer().getStringWidth(this.getName()) / 2), (int) (position.y + size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset + size.y), -1);
 
+        float offsetN = size.y;
         if (this.isExtended()) {
-            float offsetN = offset + size.y * 2;
+            offsetN += size.y;
             for (ModeSetting.ModeTemplate mode : this.getModes()) {
-                RenderUtil.drawRect(position.x, position.y + offset, position.x + size.x, position.y + size.y + offset, mode.equals(this.getCurrentMode()) ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
-                Statics.getFontRenderer().drawString(mode.getName(), (int) (position.x + size.x / 2 - Statics.getFontRenderer().getStringWidth(mode.getName()) / 2), (int) (position.y + size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset), -1);
+                RenderUtil.drawRect(position.x, position.y + offsetN, position.x + size.x, position.y + size.y + offsetN, mode.equals(this.getCurrentMode()) ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
+                Statics.getFontRenderer().drawString(mode.getName(), (int) (position.x + size.x / 2 - Statics.getFontRenderer().getStringWidth(mode.getName()) / 2), (int) (position.y + size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offsetN), -1);
+
+                // Don't increment if it's the last module.
+                if (this.getModes()[this.getModes().length - 1].equals(mode)) continue;
                 offsetN += size.y;
             }
-            offsetN = offset - size.y * 2;
-            return offsetN;
         }
-        return size.y;
+        return offsetN;
     }
 
     public ModeTemplate[] getModes() {

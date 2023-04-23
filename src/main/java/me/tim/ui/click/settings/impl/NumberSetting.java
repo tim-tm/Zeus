@@ -2,6 +2,7 @@ package me.tim.ui.click.settings.impl;
 
 import me.tim.Statics;
 import me.tim.ui.click.settings.Setting;
+import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.util.MathHelper;
 
@@ -22,7 +23,7 @@ public class NumberSetting extends Setting {
 
     @Override
     public float draw(Vector2f position, Vector2f size, float offset, int mouseX, int mouseY) {
-        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35, 215));
+        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35));
 
         String settingName = this.getName();
         if (this.isDragging()) {
@@ -30,8 +31,8 @@ public class NumberSetting extends Setting {
             float val = this.getMinValue() + (MathHelper.clamp_float((mouseX - position.x) / size.x, 0, 1)) * diff;
             this.setValue(val);
 
-            float factor = this.getValue() / this.getMaxValue();
-            RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + (size.x * factor), position.y + size.y * 2 + offset, new Color(200, 25, 200, 255));
+            float factor = MathUtil.percentage(this.getValue() - this.getMinValue(), this.getMaxValue() - this.getMinValue());
+            RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + (size.x * factor), position.y + size.y * 2 + offset, new Color(200, 25, 200));
             settingName = String.valueOf(Math.round(this.getValue() * 100D) / 100D);
         }
 
