@@ -23,9 +23,10 @@ public class ZeusIngame {
         for (Module module : this.getSortedModules()) {
             if (!module.isEnabled()) continue;
 
-            String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
-            int height = Statics.getFontRenderer().FONT_HEIGHT;
-            int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName() + suffix);
+            final String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
+            final int height = Statics.getFontRenderer().FONT_HEIGHT;
+            final int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName() + suffix);
+
             Statics.getFontRenderer().drawString(module.getName() + " " + module.getSuffix(), x, y, -1);
             index++;
         }

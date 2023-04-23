@@ -32,6 +32,7 @@ public class ModuleManager {
 
         this.modules.add(new Cleaner());
         this.modules.add(new FastBridge());
+        this.modules.add(new FastEat());
         this.modules.add(new Stealer());
         this.modules.add(new Teams());
 
