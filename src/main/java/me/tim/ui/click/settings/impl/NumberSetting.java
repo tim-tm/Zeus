@@ -1,6 +1,12 @@
 package me.tim.ui.click.settings.impl;
 
+import me.tim.Statics;
 import me.tim.ui.click.settings.Setting;
+import me.tim.util.render.shader.RenderUtil;
+import net.minecraft.util.MathHelper;
+
+import javax.vecmath.Vector2f;
+import java.awt.*;
 
 public class NumberSetting extends Setting {
     private float value;
@@ -12,6 +18,29 @@ public class NumberSetting extends Setting {
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.value = defaultValue;
+    }
+
+    @Override
+    public float draw(Vector2f position, Vector2f size, float offset, int mouseX, int mouseY) {
+        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35, 215));
+
+        String settingName = this.getName();
+        if (this.isDragging()) {
+            float diff = this.getMaxValue() - this.getMinValue();
+            float val = this.getMinValue() + (MathHelper.clamp_float((mouseX - position.x) / size.x, 0, 1)) * diff;
+            this.setValue(val);
+
+            float factor = this.getValue() / this.getMaxValue();
+            RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + (size.x * factor), position.y + size.y * 2 + offset, new Color(200, 25, 200, 255));
+            settingName = String.valueOf(Math.round(this.getValue() * 100D) / 100D);
+        }
+
+        if (this.isHovered(new Vector2f(position.x, position.y + offset + size.y), size, mouseX, mouseY)) {
+            settingName = String.valueOf(Math.round(this.getValue() * 100D) / 100D);
+        }
+
+        Statics.getFontRenderer().drawString(settingName, (int) (position.x + size.x / 2 - Statics.getFontRenderer().getStringWidth(settingName) / 2), (int) (position.y + size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset + size.y), -1);
+        return size.y;
     }
 
     public float getMinValue() {

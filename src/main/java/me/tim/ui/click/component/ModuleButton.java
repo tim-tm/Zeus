@@ -4,11 +4,9 @@ import me.tim.Statics;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.Setting;
 import me.tim.ui.click.settings.impl.BooleanSetting;
-import me.tim.ui.click.settings.impl.ColorSetting;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.render.shader.RenderUtil;
-import net.minecraft.util.MathHelper;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;
@@ -28,60 +26,6 @@ public class ModuleButton implements CUIComponent {
         this.extended = false;
     }
 
-    private void drawSetting(Setting setting, int mouseX, int mouseY) {
-        if (setting instanceof ModeSetting) {
-            ModeSetting modeSetting = (ModeSetting) setting;
-            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, new Color(35, 35, 35, 215));
-            Statics.getFontRenderer().drawString(setting.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(setting.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + this.offset + this.size.y), -1);
-
-            if (modeSetting.isExtended()) {
-                float offset = this.offset + this.size.y * 2;
-                for (ModeSetting.ModeTemplate mode : modeSetting.getModes()) {
-                    RenderUtil.drawRect(this.position.x, this.position.y + offset, this.position.x + this.size.x, this.position.y + this.size.y + offset, mode.equals(modeSetting.getCurrentMode()) ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
-                    Statics.getFontRenderer().drawString(mode.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(mode.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset), -1);
-                    offset += this.size.y;
-                }
-                this.offset = offset - this.size.y * 2;
-            }
-        }
-
-        if (setting instanceof NumberSetting) {
-            NumberSetting numberSetting = (NumberSetting) setting;
-            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, new Color(35, 35, 35, 215));
-
-            String settingName = setting.getName();
-            if (numberSetting.isDragging()) {
-                float diff = numberSetting.getMaxValue() - numberSetting.getMinValue();
-                float val = numberSetting.getMinValue() + (MathHelper.clamp_float((mouseX - this.position.x) / this.size.x, 0, 1)) * diff;
-                numberSetting.setValue(val);
-
-                float factor = numberSetting.getValue() / numberSetting.getMaxValue();
-                RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + (this.size.x * factor), this.position.y + this.size.y * 2 + this.offset, new Color(200, 25, 200, 255));
-                settingName = String.valueOf(Math.round(numberSetting.getValue() * 100D) / 100D);
-            }
-
-            if (this.isHovered(new Vector2f(this.position.x, this.position.y + this.offset + this.size.y), this.size, mouseX, mouseY)) {
-                settingName = String.valueOf(Math.round(numberSetting.getValue() * 100D) / 100D);
-            }
-
-            Statics.getFontRenderer().drawString(settingName, (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(settingName) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + this.offset + this.size.y), -1);
-        }
-
-        if (setting instanceof BooleanSetting) {
-            BooleanSetting booleanSetting = (BooleanSetting) setting;
-            RenderUtil.drawRect(this.position.x, this.position.y + this.offset + this.size.y, this.position.x + this.size.x, this.position.y + this.size.y * 2 + this.offset, booleanSetting.getValue() ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
-            Statics.getFontRenderer().drawString(setting.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(setting.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + this.offset + this.size.y), -1);
-        }
-
-        if (setting instanceof ColorSetting) {
-            ColorSetting colorSetting = (ColorSetting) setting;
-            /*float red = MathHelper.clamp_float(colorSetting.getColor().getRed() / 255f, 0, 1);
-            float green = MathHelper.clamp_float(colorSetting.getColor().getGreen() / 255f, 0, 1);
-            float blue = MathHelper.clamp_float(colorSetting.getColor().getBlue() / 255f, 0, 1);
-            */
-        }
-    }
-
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         RenderUtil.drawRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, this.module.isEnabled() ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
@@ -92,8 +36,7 @@ public class ModuleButton implements CUIComponent {
             for (Setting setting : this.module.getSettings()) {
                 if (!setting.isVisible()) continue;
 
-                this.drawSetting(setting, mouseX, mouseY);
-                this.offset += this.size.y;
+                this.offset += setting.draw(position, size, offset, mouseX, mouseY);
             }
         } else {
             this.offset = 0;

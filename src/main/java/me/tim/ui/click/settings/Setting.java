@@ -1,6 +1,8 @@
 package me.tim.ui.click.settings;
 
-public class Setting {
+import javax.vecmath.Vector2f;
+
+public abstract class Setting {
     private String name, description;
     private boolean visible;
 
@@ -12,6 +14,12 @@ public class Setting {
         this.name = name;
         this.description = description;
         this.visible = visible;
+    }
+
+    public abstract float draw(Vector2f position, Vector2f size, float offset, int mouseX, int mouseY);
+
+    protected boolean isHovered(Vector2f position, Vector2f size, float mouseX, float mouseY) {
+        return mouseX >= position.x && mouseX <= position.x + size.x && mouseY >= position.y && mouseY <= position.y + size.y;
     }
 
     public String getName() {
