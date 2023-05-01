@@ -1249,13 +1249,13 @@ public abstract class Entity implements ICommandSender
     {
         float yaw = this.rotationYaw;
         boolean cancelled = false;
-        if (this == Statics.getPlayer()) {
-            if (EntityPlayer.movementYaw != null) {
-                yaw = EntityPlayer.movementYaw;
-            }
+        Statics.movementYaw = null;
 
+        if (this == Statics.getPlayer()) {
             EventStrafe eventStrafe = new EventStrafe(yaw, forward, strafe, friction);
             eventStrafe.call();
+            Statics.movementYaw = eventStrafe.getYaw();
+
             strafe = eventStrafe.getStrafe();
             forward = eventStrafe.getForward();
             friction = eventStrafe.getFriction();
@@ -1264,7 +1264,6 @@ public abstract class Entity implements ICommandSender
         }
 
         if (cancelled) return;
-
         float f = strafe * strafe + forward * forward;
 
         if (f >= 1.0E-4F)

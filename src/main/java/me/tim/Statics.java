@@ -7,7 +7,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.util.*;
 
@@ -15,6 +14,7 @@ import java.util.UUID;
 
 public class Statics {
     private static double speed = 0.265f;
+    public static Float movementYaw;
 
     public static Minecraft getMinecraft() {
         return Minecraft.getMinecraft();
@@ -61,7 +61,7 @@ public class Statics {
     }
 
     public static void speed(float d) {
-        double yaw = EntityPlayer.movementYaw != null ? EntityPlayer.movementYaw : getPlayer().rotationYaw;
+        double yaw = Statics.movementYaw != null ? Statics.movementYaw : getPlayer().rotationYaw;
         boolean moving = !(getPlayer().moveForward == 0.0F && getPlayer().moveStrafing == 0.0F);
         boolean movingForward = getPlayer().moveForward > 0.0F;
         boolean movingBackward = getPlayer().moveForward < 0.0F;
@@ -118,7 +118,7 @@ public class Statics {
     public static void setMoveSpeed(EventMove event, final double speed) {
         double forward = getMovementInput().moveForward;
         double strafe = getMovementInput().moveStrafe;
-        float yaw = EntityPlayer.movementYaw == null ? getPlayer().rotationYaw : EntityPlayer.movementYaw;
+        float yaw = Statics.movementYaw != null ? Statics.movementYaw : getPlayer().rotationYaw;
         if (forward == 0.0 && strafe == 0.0) {
             event.setX(0.0);
             event.setZ(0.0);

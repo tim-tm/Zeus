@@ -56,13 +56,6 @@ public class Velocity extends Module {
                     Statics.sendPacket(new C0BPacketEntityAction(Statics.getPlayer(), C0BPacketEntityAction.Action.STOP_SNEAKING));
                     this.actionRequested = false;
                     break;
-                case GRIM:
-                    if (this.ticks > 1 && this.ticks <= 8) {
-                        Statics.multMotion(0.265f / this.ticks);
-                    } else if (this.ticks > 8) {
-                        this.actionRequested = false;
-                    }
-                    break;
                 case TICK:
                     if (this.ticks > this.ticksSetting.getValue()) {
                         Statics.getPlayer().motionX = 0;
@@ -120,7 +113,6 @@ public class Velocity extends Module {
                 packet.motionZ *= this.percentageSetting.getValue() / 100.f;
                 event.setPacket(packet);
                 break;
-            case GRIM:
             case SNEAK:
             case TICK:
                 this.actionRequested = true;
@@ -153,7 +145,6 @@ public class Velocity extends Module {
         JUMP("Jump"),
         PERCENTAGE("Percentage"),
         SNEAK("Sneak"),
-        GRIM("Grim"),
         TICK("Tick"),
         REVERSE("Reverse"),
         INVALID("Invalid");

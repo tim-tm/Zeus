@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+
+import me.tim.Statics;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -1575,7 +1577,7 @@ public abstract class EntityLivingBase extends Entity
 
         if (this.isSprinting())
         {
-            float f = (EntityPlayer.movementYaw != null ? EntityPlayer.movementYaw : this.rotationYaw) * 0.017453292F;
+            float f = (Statics.movementYaw != null ? Statics.movementYaw : this.rotationYaw) * 0.017453292F;
             this.motionX -= (double)(MathHelper.sin(f) * 0.2F);
             this.motionZ += (double)(MathHelper.cos(f) * 0.2F);
         }

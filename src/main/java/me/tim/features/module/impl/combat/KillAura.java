@@ -2,6 +2,7 @@ package me.tim.features.module.impl.combat;
 
 import me.tim.Statics;
 import me.tim.features.event.EventPreMotion;
+import me.tim.features.event.EventStrafe;
 import me.tim.features.event.EventTick;
 import me.tim.features.event.EventUpdate;
 import me.tim.features.event.api.EventTarget;
@@ -21,7 +22,6 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class KillAura extends Module {
-    private ModeSetting switchModeSetting, autoBlockModeSetting;
+    private ModeSetting switchModeSetting, autoBlockModeSetting, strafeModeSetting;
     private NumberSetting aRangeSetting, apsSetting, dRangeSetting, twRangeSetting, switchDelaySetting, maxHurtTimeSetting, particleMultiplierSetting, reduceSetting;
-    private BooleanSetting keepSprintSetting, moveFixSetting, newHitDelaySetting, autoAnnoySetting, searchSetting;
+    private BooleanSetting keepSprintSetting, newHitDelaySetting, autoAnnoySetting, searchSetting;
 
     private final Rotation rotation;
     private final Timer attackTimer, switchTimer, annoyTimer;
@@ -62,6 +62,7 @@ public class KillAura extends Module {
     protected void setupSettings() {
         this.settings.add(this.switchModeSetting = new ModeSetting("Switch Mode", "How should the target be detected?", SwitchMode.values(), SwitchMode.RANGE));
         this.settings.add(this.autoBlockModeSetting = new ModeSetting("AutoBlock Mode", "The way, the KillAura is going to block for you!", BlockMode.values(), BlockMode.OFF));
+        this.settings.add(this.strafeModeSetting = new ModeSetting("Strafe Mode", "Move like you're legit!", Rotation.StrafeMode.values(), Rotation.StrafeMode.OFF));
 
         this.settings.add(this.apsSetting = new NumberSetting("APS", "How often do you want to attack in a second?", 1f, 40f, 10f));
         this.settings.add(this.aRangeSetting = new NumberSetting("Attack-Range", "The Range in which you are going to attack!", 3f, 8f, 4f));
@@ -74,7 +75,6 @@ public class KillAura extends Module {
 
         this.settings.add(this.autoAnnoySetting = new BooleanSetting("Auto-Annoy", "Auto-Annoy by using Rods, Eggs or Snowballs!", false));
         this.settings.add(this.keepSprintSetting = new BooleanSetting("KeepSprint", "Prevent sprinting while attacking!", false));
-        this.settings.add(this.moveFixSetting = new BooleanSetting("MoveFix", "Legit strafing!", true));
         this.settings.add(this.searchSetting = new BooleanSetting("Search", "Search for the best rotation!", false));
         this.settings.add(this.newHitDelaySetting = new BooleanSetting("1.9 Hit Delay", "Hit Delayed due to how newer MC Versions work!", false));
     }
@@ -136,7 +136,6 @@ public class KillAura extends Module {
         }
 
         if (this.currTarget == null || this.currTarget.getHealth() <= 0 || Statics.getPlayer().getDistanceToEntity(this.currTarget) > this.dRangeSetting.getValue()) {
-            EntityPlayer.movementYaw = null;
             this.rotation.reset();
             this.setSuffix("");
             return;
@@ -163,11 +162,14 @@ public class KillAura extends Module {
         } else {
             this.rotation.apply(this.currTarget);
         }
-        if (this.moveFixSetting.getValue()) {
-            EntityPlayer.movementYaw = this.rotation.getYaw();
-        } else {
-            EntityPlayer.movementYaw = null;
-        }
+    }
+
+    @EventTarget
+    private void onStrafe(EventStrafe eventStrafe) {
+        Rotation.StrafeMode mode = (Rotation.StrafeMode) EnumUtil.fromName(this.strafeModeSetting.getCurrentMode().getName(), Rotation.StrafeMode.values());
+        if (mode == null) return;
+
+        this.rotation.strafe(eventStrafe, mode, this.keepSprintSetting.getValue());
     }
 
     @EventTarget
@@ -275,7 +277,6 @@ public class KillAura extends Module {
         super.onDisable();
         this.currTarget = null;
         Statics.getGameSettings().keyBindDrop.pressed = false;
-        EntityPlayer.movementYaw = null;
 
         if (Statics.getPlayer() != null)
             this.rotation.reset();
