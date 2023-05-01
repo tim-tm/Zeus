@@ -10,6 +10,7 @@ import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.common.EnumUtil;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import org.lwjgl.input.Keyboard;
@@ -38,7 +39,7 @@ public class Velocity extends Module {
         this.mode = (VelocityModes) EnumUtil.fromName(this.modeSetting.getCurrentMode().getName(), VelocityModes.values());
         if (this.mode == null) return;
 
-        this.percentageSetting.setVisible(this.mode.equals(VelocityModes.PERCENTAGE));
+        this.percentageSetting.setVisible(this.mode.equals(VelocityModes.PERCENTAGE) || this.mode.equals(VelocityModes.REVERSE));
         this.ticksSetting.setVisible(this.mode.equals(VelocityModes.TICK));
 
         String suffix = this.mode.getName();
@@ -56,9 +57,9 @@ public class Velocity extends Module {
                     this.actionRequested = false;
                     break;
                 case GRIM:
-                    if (this.ticks > 2 && this.ticks <= 6) {
-                        Statics.multMotion(0.3089f);
-                    } else if (this.ticks > 6) {
+                    if (this.ticks > 1 && this.ticks <= 8) {
+                        Statics.multMotion(0.265f / this.ticks);
+                    } else if (this.ticks > 8) {
                         this.actionRequested = false;
                     }
                     break;
@@ -124,6 +125,13 @@ public class Velocity extends Module {
             case TICK:
                 this.actionRequested = true;
                 break;
+            case REVERSE:
+                packet.motionX = (int) (-packet.motionX * (this.percentageSetting.getValue() / 100.f));
+                packet.motionZ = (int) (-packet.motionZ * (this.percentageSetting.getValue() / 100.f));
+                break;
+            case INVALID:
+                Statics.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(1337, 69, 420, false));
+                break;
         }
     }
 
@@ -146,7 +154,9 @@ public class Velocity extends Module {
         PERCENTAGE("Percentage"),
         SNEAK("Sneak"),
         GRIM("Grim"),
-        TICK("Tick");
+        TICK("Tick"),
+        REVERSE("Reverse"),
+        INVALID("Invalid");
 
         private final String name;
 

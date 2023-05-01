@@ -21,7 +21,7 @@ public class TargetHUD extends Module {
     private BooleanSetting projectedSetting;
 
     private KillAura killAuraModule;
-    private float x, y, width, height;
+    private float x, y, width, height, healthPerc;
 
     public TargetHUD() {
         super("TargetHUD", "See target information!", Keyboard.KEY_NONE, Category.RENDER);
@@ -76,7 +76,7 @@ public class TargetHUD extends Module {
     }
 
     private void drawTargetHUD() {
-        float healthPerc = MathUtil.percentage(this.killAuraModule.getCurrTarget().getHealth(), this.killAuraModule.getCurrTarget().getMaxHealth());
+        this.healthPerc = MathUtil.interpolate(this.healthPerc, MathUtil.percentage(this.killAuraModule.getCurrTarget().getHealth(), this.killAuraModule.getCurrTarget().getMaxHealth()), 0.1).floatValue();
         healthPerc = MathHelper.clamp_float(healthPerc, 0, 1);
         int col = (int) (255 * healthPerc);
 

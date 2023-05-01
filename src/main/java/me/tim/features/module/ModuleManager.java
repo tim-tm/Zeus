@@ -23,6 +23,7 @@ public class ModuleManager {
         this.modules.add(new Velocity());
         this.modules.add(new Tickbase());
 
+        this.modules.add(new BoatFly());
         this.modules.add(new Fly());
         this.modules.add(new LongJump());
         this.modules.add(new NoSlow());
