@@ -103,7 +103,7 @@ public class RenderUtil {
         return framebuffer;
     }
 
-    public static void drawBloom(int sourceTexture, int radius, int offset, Color color) {
+    public static void drawBloom(int sourceTexture, int radius, int offset, Color color, boolean projected) {
         BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(BLOOM_FRAMEBUFFER);
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.0f);
@@ -121,6 +121,8 @@ public class RenderUtil {
 
         BLOOM_FRAMEBUFFER.framebufferClear();
         BLOOM_FRAMEBUFFER.bindFramebuffer(true);
+
+        if (projected) Statics.getMinecraft().entityRenderer.setupCameraTransform(Statics.getTimer().renderPartialTicks, 0);
 
         BLOOM_SHADER.setRadius(radius);
         BLOOM_SHADER.setDirection(new Vector2f(offset, 0));

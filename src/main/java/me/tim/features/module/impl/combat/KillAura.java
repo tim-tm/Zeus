@@ -162,6 +162,7 @@ public class KillAura extends Module {
         } else {
             this.rotation.apply(this.currTarget);
         }
+        Statics.movementYaw = this.rotation.getYaw();
     }
 
     @EventTarget
@@ -277,6 +278,7 @@ public class KillAura extends Module {
         super.onDisable();
         this.currTarget = null;
         Statics.getGameSettings().keyBindDrop.pressed = false;
+        Statics.movementYaw = null;
 
         if (Statics.getPlayer() != null)
             this.rotation.reset();

@@ -1249,13 +1249,10 @@ public abstract class Entity implements ICommandSender
     {
         float yaw = this.rotationYaw;
         boolean cancelled = false;
-        Statics.movementYaw = null;
 
         if (this == Statics.getPlayer()) {
             EventStrafe eventStrafe = new EventStrafe(yaw, forward, strafe, friction);
             eventStrafe.call();
-            Statics.movementYaw = eventStrafe.getYaw();
-
             strafe = eventStrafe.getStrafe();
             forward = eventStrafe.getForward();
             friction = eventStrafe.getFriction();

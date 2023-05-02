@@ -1577,7 +1577,12 @@ public abstract class EntityLivingBase extends Entity
 
         if (this.isSprinting())
         {
-            float f = (Statics.movementYaw != null ? Statics.movementYaw : this.rotationYaw) * 0.017453292F;
+            float yaw = this.rotationYaw;
+            if (Statics.movementYaw != null && Math.abs(this.rotationYaw - Statics.movementYaw) > 1.0E-3) {
+                yaw = Statics.movementYaw;
+            }
+
+            float f = yaw * 0.017453292F;
             this.motionX -= (double)(MathHelper.sin(f) * 0.2F);
             this.motionZ += (double)(MathHelper.cos(f) * 0.2F);
         }

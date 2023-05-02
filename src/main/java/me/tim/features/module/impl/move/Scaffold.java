@@ -83,6 +83,8 @@ public class Scaffold extends Module {
             }
         }
 
+        Statics.movementYaw = this.rotation.getYaw();
+
         if (towerMode == null || !Statics.getGameSettings().keyBindSneak.pressed) return;
         switch (towerMode) {
             case NCP:
@@ -204,6 +206,7 @@ public class Scaffold extends Module {
             Statics.getTimer().timerSpeed = 1;
             this.syncCurrentPlayItem();
         }
+        Statics.movementYaw = null;
     }
 
     private void syncCurrentPlayItem() {
