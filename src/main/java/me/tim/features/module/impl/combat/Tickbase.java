@@ -45,7 +45,7 @@ public class Tickbase extends Module {
                 float speed = 1f / (this.ticks / 2f);
                 speed = MathHelper.clamp_float(speed, 0.05f, 1);
 
-                Statics.getTimer().timerSpeed = this.ticks > 1 ?  speed : 1;
+                Statics.getTimer().timerSpeed = this.ticks > 1 ? speed : 1;
                 Statics.getMinecraft().runTick();
                 this.ticks++;
             } catch (IOException ignored) { }

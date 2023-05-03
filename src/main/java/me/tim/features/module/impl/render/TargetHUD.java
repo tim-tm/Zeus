@@ -1,7 +1,6 @@
 package me.tim.features.module.impl.render;
 
 import me.tim.Statics;
-import me.tim.features.event.EventBloom;
 import me.tim.features.event.EventRender2D;
 import me.tim.features.event.EventRender3D;
 import me.tim.features.event.api.EventTarget;
@@ -12,6 +11,7 @@ import me.tim.ui.click.settings.impl.BooleanSetting;
 import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
@@ -22,6 +22,7 @@ public class TargetHUD extends Module {
 
     private KillAura killAuraModule;
     private float x, y, width, height, healthPerc;
+    private Framebuffer bloomBuffer = new Framebuffer(1, 1, false);
 
     public TargetHUD() {
         super("TargetHUD", "See target information!", Keyboard.KEY_NONE, Category.RENDER);
@@ -37,16 +38,9 @@ public class TargetHUD extends Module {
         if (!this.killAuraModule.isEnabled() || this.killAuraModule.getCurrTarget() == null || this.projectedSetting.getValue()) return;
         this.x = eventRender2D.getWidth() / 2f + 20;
         this.y = eventRender2D.getHeight() / 2f + 20;
-        this.width = 125;
-        this.height = 60;
+        this.width = 100;
+        this.height = 40;
         this.drawTargetHUD();
-    }
-
-    @EventTarget
-    private void onBloom(EventBloom eventBloom) {
-        if (!this.killAuraModule.isEnabled() || this.killAuraModule.getCurrTarget() == null || this.projectedSetting.getValue()) return;
-
-        RenderUtil.drawRoundedRect(this.x, this.y, this.x + this.width, this.y + this.height, 3f, new Color(255, 255, 255));
     }
 
     @EventTarget
@@ -80,8 +74,18 @@ public class TargetHUD extends Module {
         healthPerc = MathHelper.clamp_float(healthPerc, 0, 1);
         int col = (int) (255 * healthPerc);
 
-        RenderUtil.drawRoundedRect(this.x, this.y, this.x + this.width * healthPerc, this.y + this.height, 3f, new Color(255 - col, col, 0, 100));
+        RenderUtil.drawRoundedRect(this.x, this.y, this.x + this.width, this.y + this.height, 2f, new Color(35, 35, 35));
+
         Statics.getFontRenderer().drawString(this.killAuraModule.getCurrTarget().getName(), (int) (this.x + 10), (int) (this.y + 10), -1);
+
+        bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
+        bloomBuffer.framebufferClear();
+        bloomBuffer.bindFramebuffer(true);
+        RenderUtil.drawRoundedRect(this.x + 10, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT, this.x + (this.width - 10) * healthPerc, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT + this.height / 8, 2f, new Color(255 - col, col, 0));
+        bloomBuffer.unbindFramebuffer();
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 1, new Color(255 - col, col, 0), false);
+
+        RenderUtil.drawRoundedRect(this.x + 10, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT, this.x + (this.width - 10) * healthPerc, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT + this.height / 8, 2f, new Color(255 - col, col, 0));
     }
 
     @Override
