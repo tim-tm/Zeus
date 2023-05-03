@@ -179,6 +179,7 @@ public class KillAura extends Module {
 
         if (this.currTarget.hurtTime > this.maxHurtTimeSetting.getValue()) return;
 
+        this.handleAutoBlock(BlockState.PRE);
         if (this.currTarget.getDistanceToEntity(Statics.getPlayer()) <= this.aRangeSetting.getValue()) {
             long aps = MathUtil.random(this.apsSetting.getValue() - this.apsSetting.getValue() / 4f, this.apsSetting.getValue()).longValue();
             if (this.newHitDelaySetting.getValue()) {
@@ -186,8 +187,6 @@ public class KillAura extends Module {
             }
 
             if (RotationUtil.rayCast(this.aRangeSetting.getValue(), this.rotation) == currTarget && this.attackTimer.elapsed(1000 / aps)) {
-                this.handleAutoBlock(BlockState.PRE);
-
                 for (int i = 0; i < this.particleMultiplierSetting.getValue(); i++) {
                     Statics.getPlayer().onEnchantmentCritical(this.currTarget);
                 }
@@ -207,26 +206,30 @@ public class KillAura extends Module {
                     Statics.getPlayer().setSprinting(false);
                 }
 
-                this.handleAutoBlock(BlockState.POST);
                 this.attackTimer.reset();
             }
         }
+        this.handleAutoBlock(BlockState.POST);
     }
 
     private void handleAutoBlock(BlockState state) {
         if (this.blockMode == null || Statics.getPlayer().getCurrentEquippedItem() == null || !(Statics.getPlayer().getCurrentEquippedItem().getItem() instanceof ItemSword)) return;
+        if (Statics.getPlayer().getDistanceToEntity(this.currTarget) > this.dRangeSetting.getValue()) return;
 
         switch (state) {
             case PRE:
                 switch (this.blockMode) {
-                    case VANILLA:
+                    case DEFAULT:
                         Statics.getGameSettings().keyBindDrop.pressed = false;
+                        break;
+                    case VANILLA:
+                        Statics.getPlayerController().sendUseItem(Statics.getPlayer(), Statics.getWorld(), Statics.getPlayer().getCurrentEquippedItem());
                         break;
                 }
                 break;
             case POST:
                 switch (this.blockMode) {
-                    case VANILLA:
+                    case DEFAULT:
                         Statics.getGameSettings().keyBindDrop.pressed = true;
                         break;
                 }
@@ -266,6 +269,10 @@ public class KillAura extends Module {
         return currTarget;
     }
 
+    public boolean keepSprintEnabled() {
+        return this.keepSprintSetting != null && this.keepSprintSetting.getValue();
+    }
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -303,6 +310,7 @@ public class KillAura extends Module {
 
     public enum BlockMode implements ModeSetting.ModeTemplate {
         OFF("Off"),
+        DEFAULT("Default"),
         VANILLA("Vanilla"),
         FAKE("Fake");
 

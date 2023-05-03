@@ -11,9 +11,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import me.tim.Statics;
+import me.tim.features.module.impl.combat.KillAura;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -1575,7 +1577,13 @@ public abstract class EntityLivingBase extends Entity
             this.motionY += (double)((float)(this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F);
         }
 
-        if (this.isSprinting())
+        boolean kaFlag = false;
+        if (this instanceof EntityPlayerSP) {
+            KillAura ka = (KillAura) Statics.getZeus().moduleManager.getModuleByClass(KillAura.class);
+            kaFlag = ka.isEnabled() && ka.getCurrTarget() != null && !ka.keepSprintEnabled();
+        }
+
+        if (this.isSprinting() && !kaFlag)
         {
             float yaw = this.rotationYaw;
             if (Statics.movementYaw != null && Math.abs(this.rotationYaw - Statics.movementYaw) > 1.0E-3) {
