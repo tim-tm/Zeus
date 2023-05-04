@@ -149,7 +149,6 @@ public class GuiIngame extends Gui
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
         bloomEv.call();
-        this.render(scaledresolution, i, j, partialTicks, false);
         bloomBuffer.unbindFramebuffer();
         RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2, new Color(0, 0, 0), false);
 

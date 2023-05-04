@@ -11,6 +11,7 @@ public class ModeSetting extends Setting {
     private ModeTemplate[] modes;
     private ModeTemplate currentMode;
     private boolean extended;
+    private float otherOffset;
 
     public ModeSetting(String name, String description, ModeTemplate[] modes, ModeTemplate defaultMode) {
         super(name, description);
@@ -24,6 +25,8 @@ public class ModeSetting extends Setting {
         Statics.getFontRenderer().drawString(this.getName(), (int) (position.x + size.x / 2 - Statics.getFontRenderer().getStringWidth(this.getName()) / 2), (int) (position.y + size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2 + offset + size.y), -1);
 
         float offsetN = size.y;
+        if (this.extended) offsetN += offset;
+
         if (this.isExtended()) {
             offsetN += size.y;
             for (ModeSetting.ModeTemplate mode : this.getModes()) {
@@ -35,6 +38,8 @@ public class ModeSetting extends Setting {
                 offsetN += size.y;
             }
         }
+
+        if (this.extended) offsetN -= this.otherOffset;
         return offsetN;
     }
 
@@ -66,6 +71,10 @@ public class ModeSetting extends Setting {
 
     public void setExtended(boolean extended) {
         this.extended = extended;
+    }
+
+    public void setOtherOffset(float otherOffset) {
+        this.otherOffset = otherOffset;
     }
 
     public interface ModeTemplate {

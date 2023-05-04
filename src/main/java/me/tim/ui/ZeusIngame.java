@@ -1,13 +1,12 @@
 package me.tim.ui;
 
 import me.tim.Statics;
-import me.tim.features.event.EventShader;
 import me.tim.features.event.EventRender2D;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Module;
+import me.tim.util.common.MathUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,17 +18,8 @@ public class ZeusIngame {
 
     @EventTarget
     private void onRender2d(EventRender2D event) {
-        int index = 0;
-        for (Module module : this.getSortedModules()) {
-            if (!module.isEnabled()) continue;
-
-            final String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
-            final int height = Statics.getFontRenderer().FONT_HEIGHT;
-            final int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName() + suffix);
-
-            Statics.getFontRenderer().drawString(module.getName() + " " + module.getSuffix(), x, y, -1);
-            index++;
-        }
+        ArrayList<Module> mods = this.getSortedModules();
+        this.draw(mods);
 
         Statics.getFontRenderer().drawString("FPS: ", 10, event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT * 2 - 6, new Color(205, 75, 205).getRGB());
         Statics.getFontRenderer().drawString(String.valueOf(Minecraft.getDebugFPS()), 12 + Statics.getFontRenderer().getStringWidth("FPS: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT * 2 - 6, -1);
@@ -38,19 +28,33 @@ public class ZeusIngame {
         Statics.getFontRenderer().drawString(String.valueOf(Statics.getPing()), 12 + Statics.getFontRenderer().getStringWidth("Ping: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT - 3, -1);
     }
 
-    @EventTarget
-    private void onShader(EventShader bloomEvent) {
+    private void draw(ArrayList<Module> mods) {
         int index = 0;
-        for (Module module : this.getSortedModules()) {
+        for (Module module : mods) {
             if (!module.isEnabled()) continue;
 
-            String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
-            int height = Statics.getFontRenderer().FONT_HEIGHT;
-            int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName() + suffix);
-
-            Gui.drawRect(x - 2, y - 2, x + width, y + height, new Color(255, 255, 255).getRGB());
+            final String suffix = (module.getSuffix().isEmpty() ? "" : " " + module.getSuffix());
+            final int height = Statics.getFontRenderer().FONT_HEIGHT;
+            final int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName());
+            final Color c = this.calcColor(index, mods.size());
+            Statics.getFontRenderer().drawString(module.getName(), x, y, c.getRGB());
+            if (!module.getSuffix().isEmpty()) {
+                Statics.getFontRenderer().drawString(" " + module.getSuffix(), x + width, y, new Color(170, 170, 170).getRGB());
+            }
             index++;
         }
+    }
+
+    private Color calcColor(int index, int max) {
+        Color to = new Color(245, 35, 245);
+        Color base = new Color(100, 14, 100);
+        long min = (System.currentTimeMillis() / 45 + index) % max;
+        float val = MathUtil.percentage(min, max);
+
+        return new Color(
+                MathUtil.interpolate(to.getRed(), base.getRed(), val).intValue(),
+                MathUtil.interpolate(to.getGreen(), base.getGreen(), val).intValue(),
+                MathUtil.interpolate(to.getBlue(), base.getBlue(), val).intValue());
     }
 
     private ArrayList<Module> getSortedModules() {

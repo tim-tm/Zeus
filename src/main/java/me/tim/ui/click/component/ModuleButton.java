@@ -33,9 +33,17 @@ public class ModuleButton implements CUIComponent {
 
         if (this.extended && !this.module.getSettings().isEmpty()) {
             this.offset = 0;
+            float oOffset = 0;
             for (Setting setting : this.module.getSettings()) {
                 if (!setting.isVisible()) continue;
-
+                if (setting instanceof ModeSetting) {
+                    ModeSetting modeSetting = (ModeSetting) setting;
+                    if (modeSetting.isExtended()) {
+                        modeSetting.setOtherOffset(oOffset);
+                        oOffset += size.y;
+                        oOffset += modeSetting.getModes().length * size.y;
+                    }
+                }
                 this.offset += setting.draw(position, size, offset, mouseX, mouseY);
             }
         } else {
