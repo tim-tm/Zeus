@@ -15,6 +15,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.src.Config;
@@ -22,16 +25,20 @@ import net.minecraft.util.Vec3;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.input.Keyboard;
 
+import java.util.LinkedList;
+
 public class Backtrack extends Module {
     private NumberSetting delaySetting;
 
     private final Timer timer;
     private final TrackingInformation entityInformation;
+    private final LinkedList<Packet> packets;
 
     public Backtrack() {
         super("Backtrack", "Hit last entity positions!", Keyboard.KEY_NONE, Category.COMBAT);
         this.timer = new Timer();
         this.entityInformation = new TrackingInformation();
+        this.packets = new LinkedList<>();
     }
 
     @Override
@@ -86,6 +93,24 @@ public class Backtrack extends Module {
                     this.entityInformation.entity = ((C02PacketUseEntity) eventPacket.getPacket()).getEntityFromWorld(Statics.getWorld());
                     this.entityInformation.realPosition = this.entityInformation.entity.getPositionVector();
                 }
+
+                if (this.entityInformation.hit && this.timer.getElapsedTime() > 0 && this.timer.getElapsedTime() <= this.delaySetting.getValue()) {
+                    if (eventPacket.getPacket() instanceof C00PacketKeepAlive) {
+                        this.packets.add(eventPacket.getPacket());
+                        eventPacket.setCancelled(true);
+                    }
+                } else {
+                    if (this.packets.size() > 0) {
+                        Packet p = this.packets.poll();
+                        if (p instanceof C00PacketKeepAlive) {
+                            Statics.sendPacket(p);
+                        }
+
+                        if (p instanceof S14PacketEntity) {
+                            p.processPacket(Statics.getMinecraft().getNetHandler().getNetworkManager().getNetHandler());
+                        }
+                    }
+                }
                 break;
             case RECEIVE:
                 if (eventPacket.getPacket() instanceof S14PacketEntity) {
@@ -96,6 +121,7 @@ public class Backtrack extends Module {
                     if (this.entityInformation.hit && entity != null && entity.equals(this.entityInformation.entity)) {
                         if (!this.timer.elapsed((long) this.delaySetting.getValue())) {
                             eventPacket.setCancelled(true);
+                            this.packets.add(eventPacket.getPacket());
 
                             double posX = packetEntity.getX() / 32.0D;
                             double posY = packetEntity.getX() / 32.0D;
