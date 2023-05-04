@@ -1,7 +1,7 @@
 package me.tim.features.module.impl.render;
 
 import me.tim.Statics;
-import me.tim.features.event.EventBloom;
+import me.tim.features.event.EventShader;
 import me.tim.features.event.EventRender2D;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
@@ -54,8 +54,8 @@ public class Radar extends Module {
     }
 
     @EventTarget
-    private void onBloom(EventBloom eventBloom) {
-        Gui.drawRect(eventBloom.getWidth() - size - 15, eventBloom.getHeight() - size - 15, eventBloom.getWidth() - 15, eventBloom.getHeight() - 15, -1);
+    private void onShader(EventShader eventShader) {
+        Gui.drawRect(eventShader.getWidth() - size - 15, eventShader.getHeight() - size - 15, eventShader.getWidth() - 15, eventShader.getHeight() - 15, -1);
     }
 
     @Override

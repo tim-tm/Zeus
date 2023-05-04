@@ -9,8 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import me.tim.features.event.EventBloom;
+import me.tim.features.event.EventShader;
 import me.tim.features.event.EventRender2D;
+import me.tim.util.render.StencilUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -143,14 +144,20 @@ public class GuiIngame extends Gui
         int j = scaledresolution.getScaledHeight();
         this.mc.entityRenderer.setupOverlayRendering();
 
+        EventShader bloomEv = new EventShader(i, j);
         bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
-        EventBloom bloomEv = new EventBloom(new Color(0, 0, 0), i, j);
         bloomEv.call();
         this.render(scaledresolution, i, j, partialTicks, false);
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2, bloomEv.getBloomColor(), false);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 2, new Color(0, 0, 0), false);
+
+        StencilUtil.write(false);
+        bloomEv.call();
+        StencilUtil.erase(true);
+        RenderUtil.drawBlur(15, 1, false);
+        StencilUtil.dispose();
 
         new EventRender2D(i, j, partialTicks).call();
 

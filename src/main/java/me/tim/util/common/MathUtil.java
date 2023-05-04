@@ -1,7 +1,10 @@
 package me.tim.util.common;
 
+import org.lwjgl.BufferUtils;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.FloatBuffer;
 
 public class MathUtil {
     public static Double random(float min, float max) {
@@ -24,5 +27,14 @@ public class MathUtil {
     public static Double round(double value, int places) {
         BigDecimal bigDecimal = new BigDecimal(value).setScale(places, RoundingMode.HALF_EVEN);
         return bigDecimal.doubleValue();
+    }
+
+    public static FloatBuffer makeGausBuffer(float radius) {
+        FloatBuffer weights = BufferUtils.createFloatBuffer(256);
+        for (int i = 0; i <= radius; i++) {
+            weights.put(MathUtil.calculateGaussianValue(i, radius).floatValue());
+        }
+        weights.rewind();
+        return weights;
     }
 }

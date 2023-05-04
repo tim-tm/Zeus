@@ -3,6 +3,7 @@ package me.tim.util.render.shader;
 import me.tim.Statics;
 import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.impl.BloomShader;
+import me.tim.util.render.shader.impl.BlurShader;
 import me.tim.util.render.shader.impl.CircleShader;
 import me.tim.util.render.shader.impl.RoundedRectShader;
 import net.minecraft.block.Block;
@@ -18,7 +19,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.optifine.model.BlockModelUtils;
 import net.optifine.shaders.Shaders;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
@@ -30,13 +30,16 @@ public class RenderUtil {
     private static final RoundedRectShader ROUNDED_RECT_SHADER = new RoundedRectShader();
     private static final BloomShader BLOOM_SHADER = new BloomShader();
     private static final CircleShader CIRCLE_SHADER = new CircleShader();
+    private static final BlurShader BLUR_SHADER = new BlurShader();
 
     private static Framebuffer BLOOM_FRAMEBUFFER = new Framebuffer(1, 1, false);
+    private static Framebuffer BLUR_FRAMEBUFFER = new Framebuffer(1, 1, false);
 
     static {
         ROUNDED_RECT_SHADER.setup();
         BLOOM_SHADER.setup();
         CIRCLE_SHADER.setup();
+        BLUR_SHADER.setup();
     }
 
     public static void drawRoundedRect(float x, float y, float x2, float y2, float radius, Color color) {
@@ -110,11 +113,7 @@ public class RenderUtil {
         GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
-        FloatBuffer weights = BufferUtils.createFloatBuffer(256);
-        for (int i = 0; i <= radius; i++) {
-            weights.put(MathUtil.calculateGaussianValue(i, radius).floatValue());
-        }
-        weights.rewind();
+        FloatBuffer weights = MathUtil.makeGausBuffer(radius);
 
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
@@ -150,6 +149,48 @@ public class RenderUtil {
         GlStateManager.alphaFunc(516, 0.1f);
         GlStateManager.enableAlpha();
 
+        GlStateManager.bindTexture(0);
+    }
+
+    public static void drawBlur(int radius, int offset, boolean projected) {
+        BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(BLUR_FRAMEBUFFER);
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(516, 0.0f);
+        GlStateManager.enableBlend();
+        GlStateManager.color(1, 1, 1, 1);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+
+        FloatBuffer weights = MathUtil.makeGausBuffer(radius);
+
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
+
+        BLUR_FRAMEBUFFER.framebufferClear();
+        BLUR_FRAMEBUFFER.bindFramebuffer(true);
+
+        if (projected) Statics.getMinecraft().entityRenderer.setupCameraTransform(Statics.getTimer().renderPartialTicks, 0);
+
+        BLUR_SHADER.setRadius(radius);
+        BLUR_SHADER.setDirection(new Vector2f(offset, 0));
+        BLUR_SHADER.setWeights(weights);
+        BLUR_SHADER.use();
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Statics.getMinecraft().getFramebuffer().framebufferTexture);
+        BLUR_SHADER.drawQuads();
+        BLUR_FRAMEBUFFER.unbindFramebuffer();
+        BLUR_SHADER.stop();
+
+        Statics.getMinecraft().getFramebuffer().bindFramebuffer(true);
+
+        BLUR_SHADER.setDirection(new Vector2f(0, offset));
+        BLUR_SHADER.use();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, BLUR_FRAMEBUFFER.framebufferTexture);
+        BLUR_SHADER.drawQuads();
+        BLUR_SHADER.stop();
+
+        GlStateManager.alphaFunc(516, 0.1f);
+        GlStateManager.enableAlpha();
+        GlStateManager.color(1, 1, 1, 1);
         GlStateManager.bindTexture(0);
     }
 

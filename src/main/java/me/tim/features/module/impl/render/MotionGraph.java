@@ -1,9 +1,9 @@
 package me.tim.features.module.impl.render;
 
 import me.tim.Statics;
-import me.tim.features.event.EventBloom;
 import me.tim.features.event.EventPreMotion;
 import me.tim.features.event.EventRender2D;
+import me.tim.features.event.EventShader;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
@@ -71,7 +71,7 @@ public class MotionGraph extends Module {
     }
 
     @EventTarget
-    private void onBloom(EventBloom eventBloom) {
-        Gui.drawRect(5, (eventBloom.getHeight() / 2) - (height / 2), 5 + width, (eventBloom.getHeight() / 2) + (height / 2), -1);
+    private void onShader(EventShader eventShader) {
+        Gui.drawRect(5, (eventShader.getHeight() / 2) - (height / 2), 5 + width, (eventShader.getHeight() / 2) + (height / 2), -1);
     }
 }

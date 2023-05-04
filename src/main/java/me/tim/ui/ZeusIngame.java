@@ -1,7 +1,7 @@
 package me.tim.ui;
 
 import me.tim.Statics;
-import me.tim.features.event.EventBloom;
+import me.tim.features.event.EventShader;
 import me.tim.features.event.EventRender2D;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
@@ -39,7 +39,7 @@ public class ZeusIngame {
     }
 
     @EventTarget
-    private void onBloom(EventBloom bloomEvent) {
+    private void onShader(EventShader bloomEvent) {
         int index = 0;
         for (Module module : this.getSortedModules()) {
             if (!module.isEnabled()) continue;
