@@ -298,4 +298,10 @@ public class RenderUtil {
         Gui.drawScaledCustomSizeModalRect(x, y, 8.0f, 8.0f, 8, 8, width, height, 64.0f, 64.0f);
         Gui.drawScaledCustomSizeModalRect(x, y, 40.0f, 8.0f, 8, 8, width, height, 64.0f, 64.0f);
     }
+
+    public static void scale(float centerX, float centerY, float scale) {
+        GlStateManager.translate(centerX, centerY, 0);
+        GlStateManager.scale(scale, scale, 0);
+        GlStateManager.translate(-centerX, -centerY, 0);
+    }
 }

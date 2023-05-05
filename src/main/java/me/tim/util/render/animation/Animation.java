@@ -10,12 +10,13 @@ public class Animation {
     private AnimationType type;
     private AnimationState state;
 
+    /**
+     * @param delay How long should the Animation take?
+     * @param type Which type of animation?
+     * @param initialState The initial State, IN or OUT
+     */
     public Animation(long delay, AnimationType type, AnimationState initialState) {
-        this.timer = new Timer();
-        this.delay = delay;
-        this.type = type;
-        this.state = initialState;
-        this.autoState = false;
+        this(delay, type, initialState, true);
     }
 
     public Animation(long delay, AnimationType type, AnimationState initialState, boolean autoState) {

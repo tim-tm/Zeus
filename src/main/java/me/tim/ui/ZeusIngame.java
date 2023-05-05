@@ -10,14 +10,11 @@ import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.item.ItemStack;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class ZeusIngame {
-    private int lastSlot = -1;
-
     public ZeusIngame() {
         EventManager.register(this);
     }
@@ -36,14 +33,10 @@ public class ZeusIngame {
         Statics.getFontRenderer().drawString(String.valueOf(Statics.getPing()), 12 + Statics.getFontRenderer().getStringWidth("Ping: "), event.getHeight() - Statics.getFontRenderer().FONT_HEIGHT - 3, -1);
         GlStateManager.popMatrix();
 
-        int slot = MathUtil.interpolate(lastSlot * 20, Statics.getPlayer().inventory.currentItem * 20, 0.01f).intValue();
+        int slot = Statics.getPlayer().inventory.currentItem * 20;
         int k = event.getWidth() / 2 - 90 + slot + 2;
         int l = event.getHeight() - 16 - 5;
         RenderUtil.drawRoundedRect(k, l, k + 17, l + 2, 1f, new Color(235, 35, 235, 130));
-
-        if (Statics.getPlayer().inventory.currentItem != this.lastSlot || this.lastSlot == -1) {
-            this.lastSlot = Statics.getPlayer().inventory.currentItem;
-        }
     }
 
     @EventTarget
@@ -58,41 +51,20 @@ public class ZeusIngame {
             if (!module.isEnabled()) continue;
 
             final int height = Statics.getFontRenderer().FONT_HEIGHT;
-            final int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName());
+            int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName());
             final Color c = this.calcColor(index, mods.size());
+            if (!module.getSuffix().isEmpty()) {
+                width += Statics.getFontRenderer().getStringWidth(" " + module.getSuffix());
+            }
+
+            GlStateManager.pushMatrix();
+            RenderUtil.scale(x + width / 2f, y + height / 2f, module.getAnimation().animate());
             Statics.getFontRenderer().drawString(module.getName(), x, y, c.getRGB());
             if (!module.getSuffix().isEmpty()) {
-                Statics.getFontRenderer().drawString(" " + module.getSuffix(), x + width, y, new Color(170, 170, 170).getRGB());
+                Statics.getFontRenderer().drawString(" " + module.getSuffix(), x + Statics.getFontRenderer().getStringWidth(module.getName()), y, new Color(170, 170, 170).getRGB());
             }
+            GlStateManager.popMatrix();
             index++;
-        }
-    }
-
-    private void renderHotbarItem(int xPos, int yPos)
-    {
-        ItemStack itemstack = Statics.getPlayer().inventory.getCurrentItem();
-
-        if (itemstack != null)
-        {
-            float f = (float)itemstack.animationsToGo - Statics.getTimer().renderPartialTicks;
-
-            if (f > 0.0F)
-            {
-                GlStateManager.pushMatrix();
-                float f1 = 1.0F + f / 5.0F;
-                GlStateManager.translate((float)(xPos + 8), (float)(yPos + 12), 0.0F);
-                GlStateManager.scale(1.0F / f1, (f1 + 1.0F) / 2.0F, 1.0F);
-                GlStateManager.translate((float)(-(xPos + 8)), (float)(-(yPos + 12)), 0.0F);
-            }
-
-            Statics.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(itemstack, xPos, yPos);
-
-            if (f > 0.0F)
-            {
-                GlStateManager.popMatrix();
-            }
-
-            Statics.getMinecraft().getRenderItem().renderItemOverlays(Statics.getFontRenderer(), itemstack, xPos, yPos);
         }
     }
 

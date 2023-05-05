@@ -25,13 +25,13 @@ public class ClickGUI extends GuiScreen {
 
     public ClickGUI() {
         this.components = new ArrayList<>();
-        this.inAnimation = new Animation(300, AnimationType.SINE, Animation.AnimationState.IN, false);
+        this.inAnimation = new Animation(450, AnimationType.EXPO, Animation.AnimationState.IN, false);
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
-        GlStateManager.scale(1, this.inAnimation.animate(), 0);
+        RenderUtil.scale(width / 2f, height / 2f, this.inAnimation.animate());
         bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
