@@ -2,15 +2,18 @@ package me.tim.ui.notify;
 
 import me.tim.Statics;
 import me.tim.features.event.EventRender2D;
+import me.tim.features.event.EventShader;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.util.render.shader.RenderUtil;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class NotificationRenderer {
-    private ArrayList<Notification> queue;
+    private final ArrayList<Notification> queue;
 
     public NotificationRenderer() {
         EventManager.register(this);
@@ -24,18 +27,32 @@ public class NotificationRenderer {
             if (notification.getTimer().elapsed(notification.getDuration())) {
                 this.queue.remove(notification);
                 notification.getTimer().reset();
+                notification.getAnimation().reset();
                 continue;
             }
-            this.drawNotification(event, notification, i);
+            this.drawNotification(event.getWidth(), event.getHeight(), notification, i, false);
         }
     }
 
-    private void drawNotification(EventRender2D event, Notification notification, int index) {
-        int x = event.getWidth() - 200, y = event.getHeight() - 100 - 70 * index, x2 = event.getWidth() - 10, y2 = event.getHeight() - 50 - 70 * index;
-        RenderUtil.drawRoundedRect(x, y, x2, y2, 5f, new Color(0, 0, 0, 70));
-        RenderUtil.drawRoundedRect(x, y, x + (int) ((x2 - x) * notification.getTimer().getElapsedTime() / notification.getDuration()), y2, 5f, new Color(notification.getType().getColor().getRed(), notification.getType().getColor().getGreen(), notification.getType().getColor().getBlue(), 70));
-        Statics.getFontRenderer().drawString(notification.getTitle(), x + 10, y + 10, new Color(245, 245, 245).getRGB());
-        Statics.getFontRenderer().drawString(notification.getDescription(), x + 10, y + 30, new Color(245, 245, 245).getRGB());
+    @EventTarget
+    private void onShader(EventShader eventShader) {
+        for (int i = 0; i < this.queue.size(); i++) {
+            this.drawNotification(eventShader.getWidth(), eventShader.getHeight(), this.queue.get(i), i, true);
+        }
+    }
+
+    private void drawNotification(int width, int height, Notification notification, int index, boolean back) {
+        int x = width / 2 - 70 / 2, y = 5 + 25 * index, x2 = width / 2 + 70 / 2, y2 = 25 + 25 * index;
+
+        GlStateManager.pushMatrix();
+        RenderUtil.scale(x + (x2-x) / 2f, y + (y2-y) / 2f, notification.getAnimation().animate());
+        if (back) {
+            Gui.drawRect(x, y, x2, y2, new Color(0, 0, 0, 70).getRGB());
+        } else {
+            Gui.drawRect(x, y, x + (int) ((x2 - x) * notification.getTimer().getElapsedTime() / notification.getDuration()), y2, new Color(notification.getType().getColor().getRed(), notification.getType().getColor().getGreen(), notification.getType().getColor().getBlue(), 70).getRGB());
+            Statics.getFontRenderer().drawString(notification.getTitle(), width / 2 - Statics.getFontRenderer().getStringWidth(notification.getTitle()) / 2, (int) (y + (y2 - y) / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2), new Color(245, 245, 245).getRGB());
+        }
+        GlStateManager.popMatrix();
     }
 
     public void sendNotification(Notification notification) {

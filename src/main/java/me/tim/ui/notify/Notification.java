@@ -1,6 +1,8 @@
 package me.tim.ui.notify;
 
 import me.tim.util.Timer;
+import me.tim.util.render.animation.Animation;
+import me.tim.util.render.animation.AnimationType;
 
 import java.awt.*;
 
@@ -9,9 +11,10 @@ public class Notification {
     private final NotificationType type;
     private final long duration;
     private final Timer timer;
+    private final Animation animation;
 
     public Notification(String title, String description, NotificationType type) {
-        this(title, description, type, 3500);
+        this(title, description, type, 2000);
     }
 
     public Notification(String title, String description, NotificationType type, long duration) {
@@ -20,6 +23,7 @@ public class Notification {
         this.type = type;
         this.duration = duration;
         this.timer = new Timer();
+        this.animation = new Animation(400, AnimationType.QUINT, Animation.AnimationState.IN, false);
     }
 
     public String getTitle() {
@@ -40,6 +44,10 @@ public class Notification {
 
     public Timer getTimer() {
         return timer;
+    }
+
+    public Animation getAnimation() {
+        return animation;
     }
 
     public enum NotificationType {
