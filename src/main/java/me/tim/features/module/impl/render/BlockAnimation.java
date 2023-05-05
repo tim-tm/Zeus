@@ -11,11 +11,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
-public class Animation extends Module {
+public class BlockAnimation extends Module {
     private ModeSetting modeSetting;
     private BlockMode blockMode;
 
-    public Animation() {
+    public BlockAnimation() {
         super("Animation", "Different blocking animations!", Keyboard.KEY_NONE, Category.RENDER);
     }
 
@@ -33,16 +33,19 @@ public class Animation extends Module {
     private void onRenderItem(EventRenderItem eventRenderItem) {
         if (this.blockMode == null) return;
 
+        eventRenderItem.setCancelled(true);
         switch (this.blockMode) {
             case DEFAULT:
-                eventRenderItem.setCancelled(true);
                 this.transformFirstPersonItem(eventRenderItem.getF(), eventRenderItem.getF1());
                 this.doBlockTransformations();
                 break;
             case JELLO:
-                eventRenderItem.setCancelled(true);
                 GlStateManager.translate(0.5f, 0.0f, -0.5f);
                 this.transformFirstPersonItem(eventRenderItem.getF(), eventRenderItem.getF1());
+                this.doBlockTransformations();
+                break;
+            case TAP:
+                this.transformFirstPersonItem(0, eventRenderItem.getF1() - 1);
                 this.doBlockTransformations();
                 break;
         }
@@ -78,7 +81,8 @@ public class Animation extends Module {
     private enum BlockMode implements ModeSetting.ModeTemplate {
         VANILLA("Vanilla"),
         DEFAULT("Default"),
-        JELLO("Jello");
+        JELLO("Jello"),
+        TAP("Tap");
 
         private final String name;
 

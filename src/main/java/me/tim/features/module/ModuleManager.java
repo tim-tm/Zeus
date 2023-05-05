@@ -41,7 +41,7 @@ public class ModuleManager {
         this.modules.add(new FastPlace());
         this.modules.add(new Phase());
 
-        this.modules.add(new Animation());
+        this.modules.add(new BlockAnimation());
         this.modules.add(new ClickGUI());
         this.modules.add(new ESP());
         this.modules.add(new Fullbright());

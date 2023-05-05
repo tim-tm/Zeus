@@ -3,8 +3,11 @@ package me.tim.ui.click;
 import me.tim.features.module.Category;
 import me.tim.ui.click.component.CUIComponent;
 import me.tim.ui.click.component.Panel;
+import me.tim.util.render.animation.Animation;
+import me.tim.util.render.animation.AnimationType;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
 
 import javax.vecmath.Vector2f;
@@ -18,13 +21,17 @@ public class ClickGUI extends GuiScreen {
     private final ArrayList<CUIComponent> components;
     private boolean initialized = false;
     private Framebuffer bloomBuffer;
+    private final Animation inAnimation;
 
     public ClickGUI() {
         this.components = new ArrayList<>();
+        this.inAnimation = new Animation(300, AnimationType.SINE, Animation.AnimationState.IN, false);
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(1, this.inAnimation.animate(), 0);
         bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
@@ -37,6 +44,7 @@ public class ClickGUI extends GuiScreen {
         for (CUIComponent component : this.components) {
             component.drawScreen(mouseX, mouseY, partialTicks);
         }
+        GlStateManager.popMatrix();
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -83,6 +91,7 @@ public class ClickGUI extends GuiScreen {
             }
             this.initialized = true;
         }
+        this.inAnimation.reset();
         super.initGui();
     }
 

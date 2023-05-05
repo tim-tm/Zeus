@@ -10,14 +10,12 @@ import me.tim.util.common.MathUtil;
 import me.tim.util.render.shader.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.item.ItemStack;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class ZeusIngame {
-    private Framebuffer bloomBuffer = new Framebuffer(1, 1, false);
     private int lastSlot = -1;
 
     public ZeusIngame() {
