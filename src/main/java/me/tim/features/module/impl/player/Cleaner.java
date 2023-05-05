@@ -9,10 +9,12 @@ import me.tim.ui.click.settings.impl.BooleanSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.Timer;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.client.C0DPacketCloseWindow;
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class Cleaner extends Module {
     private int[] bestArmorSlots;
     private float bestSwordDamage;
     private int bestSwordSlot;
+    private boolean passed;
     private final ArrayList<Integer> trash;
 
     private final Timer startTimer, timer;
@@ -42,14 +45,15 @@ public class Cleaner extends Module {
     @Override
     protected void setupSettings() {
         this.settings.add(this.delaySetting = new NumberSetting("Delay", "Delay between inventory actions!", 0, 500, 125));
-        this.settings.add(this.startDelaySetting = new NumberSetting("Start-Delay", "Delay between stealing and opening your inventory!", 0, 500, 125));
+        this.settings.add(this.startDelaySetting = new NumberSetting("Start-Delay", "Delay between stealing and opening your inventory!", 0, 2000, 125));
 
         this.settings.add(this.onlyInvSetting = new BooleanSetting("OnlyInv", "Only sort if your inventory is opened!", true));
     }
 
     @EventTarget
     private void onUpdate(EventPreMotion event) {
-        boolean passed =
+        boolean lastPassed = this.passed;
+        this.passed =
                 Statics.getPlayer().moveForward == 0 && Statics.getPlayer().moveStrafing == 0
                         && Statics.getPlayer().onGround && Statics.getMinecraft().currentScreen == null
                         && !Statics.getPlayer().isUsingItem()
@@ -57,42 +61,49 @@ public class Cleaner extends Module {
                         && !Statics.getPlayer().isSwingInProgress
                         && !this.onlyInvSetting.getValue();
 
-        if (((Statics.getMinecraft().currentScreen != null && Statics.getMinecraft().currentScreen instanceof GuiInventory) || passed) && this.startTimer.elapsed((long) this.startDelaySetting.getValue())) {
-            if (passed) {
-                Statics.sendPacket(new C0BPacketEntityAction(Statics.getPlayer(), C0BPacketEntityAction.Action.OPEN_INVENTORY));
-            }
-            this.searchItems();
+        if (!this.startTimer.elapsed((long) this.startDelaySetting.getValue())) return;
 
-            for (int i = 0; i < 4; i++) {
-                if (this.bestArmorSlots[i] != -1) {
-                    int bestSlot = this.bestArmorSlots[i];
+        if (passed) {
+            Statics.sendPacket(new C0BPacketEntityAction(Statics.getPlayer(), C0BPacketEntityAction.Action.OPEN_INVENTORY));
+            this.clean();
+            Statics.sendPacket(new C0DPacketCloseWindow(0));
+            return;
+        } else if (lastPassed) {
+            this.startTimer.reset();
+        } else if (Statics.getMinecraft().currentScreen != null && Statics.getMinecraft().currentScreen instanceof GuiInventory) {
+            this.clean();
+        } else {
+            this.startTimer.reset();
+        }
+    }
 
-                    ItemStack oldArmor = Statics.getPlayer().inventory.armorItemInSlot(i);
-                    if (oldArmor != null && oldArmor.getItem() != null) {
-                        Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, 8 - i, 0, 1, Statics.getPlayer());
-                        if (!this.hasDelayReached()) return;
-                    }
-                    Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, bestSlot < 9 ? bestSlot + 36 : bestSlot, 0, 1, Statics.getPlayer());
+    private void clean() {
+        this.searchItems();
+
+        for (int i = 0; i < 4; i++) {
+            if (this.bestArmorSlots[i] != -1) {
+                int bestSlot = this.bestArmorSlots[i];
+
+                ItemStack oldArmor = Statics.getPlayer().inventory.armorItemInSlot(i);
+                if (oldArmor != null && oldArmor.getItem() != null) {
+                    Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, 8 - i, 0, 1, Statics.getPlayer());
                     if (!this.hasDelayReached()) return;
                 }
-            }
-
-            if (this.bestSwordSlot != -1 && this.bestSwordDamage != -1) {
-                Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, this.bestSwordSlot < 9 ? this.bestSwordSlot + 36 : this.bestSwordSlot, 0, 2, Statics.getPlayer());
+                Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, bestSlot < 9 ? bestSlot + 36 : bestSlot, 0, 1, Statics.getPlayer());
                 if (!this.hasDelayReached()) return;
             }
+        }
 
-            this.searchTrash();
+        if (this.bestSwordSlot != -1 && this.bestSwordDamage != -1) {
+            Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, this.bestSwordSlot < 9 ? this.bestSwordSlot + 36 : this.bestSwordSlot, 0, 2, Statics.getPlayer());
+            if (!this.hasDelayReached()) return;
+        }
 
-            for (Integer i : this.trash) {
-                Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, i < 9 ? i + 36 : i, 0, 4, Statics.getPlayer());
-                if (!this.hasDelayReached()) return;
-            }
+        this.searchTrash();
 
-            if (passed) {
-                Statics.sendPacket(new C0DPacketCloseWindow(0));
-            }
-            this.startTimer.reset();
+        for (Integer i : this.trash) {
+            Statics.getPlayerController().windowClick(Statics.getPlayer().inventoryContainer.windowId, i < 9 ? i + 36 : i, 0, 4, Statics.getPlayer());
+            if (!this.hasDelayReached()) return;
         }
     }
 
@@ -160,7 +171,7 @@ public class Cleaner extends Module {
 
                 float damage = sword.getToolMaterial().getDamageVsEntity();
 
-                damage -= 1;
+                damage -= 2;
 
                 if (this.bestSwordDamage == damage) {
                     this.trash.add(i);
