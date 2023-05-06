@@ -1,6 +1,5 @@
 package me.tim.util.render.shader.impl;
 
-import me.tim.Statics;
 import me.tim.util.render.shader.Shader;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL20;
@@ -20,7 +19,7 @@ public class BlurShader extends Shader {
     @Override
     public void setupUniforms() {
         this.setUniformi("textureIn", 0);
-        this.setUniformf("texelSize", 1.0F / Statics.getMinecraft().displayWidth, 1.0F / Statics.getMinecraft().displayHeight);
+        this.setUniformf("texelSize", 1.0F / this.resolution.getScaledWidth(), 1.0F / this.resolution.getScaledHeight());
         this.setUniformf("direction", this.direction.getX(), this.direction.getY());
         this.setUniformf("radius", this.radius);
         GL20.glUniform1(this.getUniform("weights"), this.weights);

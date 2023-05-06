@@ -1,6 +1,5 @@
 package me.tim.util.render.shader.impl;
 
-import me.tim.Statics;
 import me.tim.util.render.shader.Shader;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL20;
@@ -24,7 +23,7 @@ public class BloomShader extends Shader {
         this.setUniformi("inTexture", 0);
         this.setUniformi("textureToCheck", 16);
         this.setUniformf("radius", this.radius);
-        this.setUniformf("texelSize", 1.0f / Statics.getMinecraft().displayWidth, 1.0f / Statics.getMinecraft().displayHeight);
+        this.setUniformf("texelSize", 1.0f / this.resolution.getScaledWidth(), 1.0f / this.resolution.getScaledHeight());
         this.setUniformf("direction", this.direction.x, this.direction.y);
         GL20.glUniform1(this.getUniform("weights"), this.weights);
         this.setUniformf("color", this.color.getRed() / 255f, this.color.getGreen() / 255f, this.color.getBlue() / 255f);

@@ -120,7 +120,10 @@ public class RenderUtil {
         GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
-        FloatBuffer weights = MathUtil.makeGausBuffer(radius);
+        FloatBuffer weights = BLOOM_SHADER.getWeights();
+        if (radius != BLOOM_SHADER.getRadius()) {
+            weights = MathUtil.makeGausBuffer(radius);
+        }
 
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
@@ -130,9 +133,11 @@ public class RenderUtil {
 
         if (projected) Statics.getMinecraft().entityRenderer.setupCameraTransform(Statics.getTimer().renderPartialTicks, 0);
 
+        if (BLOOM_SHADER.getRadius() != radius) {
+            BLOOM_SHADER.setWeights(MathUtil.makeGausBuffer(radius));
+        }
         BLOOM_SHADER.setRadius(radius);
         BLOOM_SHADER.setDirection(new Vector2f(offset, 0));
-        BLOOM_SHADER.setWeights(weights);
         BLOOM_SHADER.setColor(color);
         BLOOM_SHADER.use();
 
@@ -166,8 +171,6 @@ public class RenderUtil {
         GlStateManager.color(1, 1, 1, 1);
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
-        FloatBuffer weights = MathUtil.makeGausBuffer(radius);
-
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
 
@@ -176,9 +179,11 @@ public class RenderUtil {
 
         if (projected) Statics.getMinecraft().entityRenderer.setupCameraTransform(Statics.getTimer().renderPartialTicks, 0);
 
-        BLUR_SHADER.setRadius(radius);
+        if (BLUR_SHADER.getRadius() != radius) {
+            BLUR_SHADER.setWeights(MathUtil.makeGausBuffer(radius));
+        }
         BLUR_SHADER.setDirection(new Vector2f(offset, 0));
-        BLUR_SHADER.setWeights(weights);
+        BLUR_SHADER.setRadius(radius);
         BLUR_SHADER.use();
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Statics.getMinecraft().getFramebuffer().framebufferTexture);

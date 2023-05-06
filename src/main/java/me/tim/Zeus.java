@@ -9,6 +9,7 @@ import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.friend.FriendManager;
 import me.tim.features.module.ModuleManager;
+import me.tim.features.module.impl.render.TargetHUD;
 import me.tim.features.script.ScriptManager;
 import me.tim.ui.ZeusIngame;
 import me.tim.ui.click.ClickGUI;
@@ -67,6 +68,7 @@ public class Zeus {
         RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
         GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
         ClickGUI.BLOOM_BUFFER = RenderUtil.createFrameBuffer(ClickGUI.BLOOM_BUFFER);
+        TargetHUD.bloomBuffer = RenderUtil.createFrameBuffer(TargetHUD.bloomBuffer);
     }
 
     public void shutdown() {

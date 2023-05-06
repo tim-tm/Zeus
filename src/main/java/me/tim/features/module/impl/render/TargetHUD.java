@@ -22,7 +22,7 @@ public class TargetHUD extends Module {
 
     private KillAura killAuraModule;
     private float x, y, width, height, healthPerc;
-    private Framebuffer bloomBuffer = new Framebuffer(1, 1, false);
+    public static Framebuffer bloomBuffer = new Framebuffer(1, 1, false);
 
     public TargetHUD() {
         super("TargetHUD", "See target information!", Keyboard.KEY_NONE, Category.RENDER);
@@ -78,12 +78,11 @@ public class TargetHUD extends Module {
 
         Statics.getFontRenderer().drawString(this.killAuraModule.getCurrTarget().getName(), (int) (this.x + 10), (int) (this.y + 10), -1);
 
-        bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
         bloomBuffer.framebufferClear();
         bloomBuffer.bindFramebuffer(true);
         RenderUtil.drawRoundedRect(this.x + 10, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT, this.x + (this.width - 10) * healthPerc, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT + this.height / 8, 2f, new Color(255 - col, col, 0));
         bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 1, new Color(255 - col, col, 0), false);
+        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 15, 1, new Color(255 - col, col, 0), false);
 
         RenderUtil.drawRoundedRect(this.x + 10, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT, this.x + (this.width - 10) * healthPerc, this.y + 15 + Statics.getFontRenderer().FONT_HEIGHT + this.height / 8, 2f, new Color(255 - col, col, 0));
     }

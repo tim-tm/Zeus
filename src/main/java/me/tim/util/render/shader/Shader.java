@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL20;
 public abstract class Shader {
     private final ResourceLocation fragmentLoc, vertexLoc;
     private int programId;
-    private ScaledResolution resolution;
+    protected ScaledResolution resolution;
 
     public Shader(ResourceLocation fragmentLoc, ResourceLocation vertexLoc) {
         this.fragmentLoc = fragmentLoc;
