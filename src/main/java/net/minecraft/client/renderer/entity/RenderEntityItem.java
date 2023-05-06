@@ -1,6 +1,9 @@
 package net.minecraft.client.renderer.entity;
 
 import java.util.Random;
+
+import me.tim.Statics;
+import me.tim.features.module.impl.render.ItemPhysics;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -90,6 +93,9 @@ public class RenderEntityItem extends Render<EntityItem>
      */
     public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
+        int rotation = (int) (((System.nanoTime() / 3000000) + entity.getEntityId() * 10000) % 360);
+        final ItemPhysics physics = (ItemPhysics) Statics.getZeus().moduleManager.getModuleByClass(ItemPhysics.class);
+
         ItemStack itemstack = entity.getEntityItem();
         this.field_177079_e.setSeed(187L);
         boolean flag = false;
@@ -107,6 +113,12 @@ public class RenderEntityItem extends Render<EntityItem>
         GlStateManager.pushMatrix();
         IBakedModel ibakedmodel = this.itemRenderer.getItemModelMesher().getItemModel(itemstack);
         int i = this.func_177077_a(entity, x, y, z, partialTicks, ibakedmodel);
+
+        if (physics != null && physics.isEnabled() && physics.getTimerSetting() != null) {
+            if (entity.onGround) rotation = 90;
+            GlStateManager.rotate(rotation / 2f, 0, 1, 0);
+            GlStateManager.rotate(rotation, 1, 0, 0);
+        }
 
         for (int j = 0; j < i; ++j)
         {

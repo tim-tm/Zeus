@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import me.tim.Statics;
 import me.tim.features.module.impl.combat.KillAura;
+import me.tim.features.module.impl.render.BlockAnimation;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -1334,7 +1335,14 @@ public abstract class EntityLivingBase extends Entity
      */
     private int getArmSwingAnimationEnd()
     {
-        return this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) : (this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6);
+        float val = this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) : (this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6);
+        float multiplier = 1f;
+        BlockAnimation anim = (BlockAnimation) Statics.getZeus().moduleManager.getModuleByClass(BlockAnimation.class);
+        if (anim != null && anim.isEnabled() && anim.getSwingSpeedSetting() != null) {
+            multiplier = anim.getSwingSpeedSetting().getValue();
+        }
+
+        return (int) (val * (1 / multiplier));
     }
 
     /**

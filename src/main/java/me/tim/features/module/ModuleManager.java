@@ -46,6 +46,7 @@ public class ModuleManager {
         this.modules.add(new ClickGUI());
         this.modules.add(new ESP());
         this.modules.add(new Fullbright());
+        this.modules.add(new ItemPhysics());
         this.modules.add(new MotionGraph());
         this.modules.add(new NoCameraClip());
         this.modules.add(new Radar());

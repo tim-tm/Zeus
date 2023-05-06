@@ -6,6 +6,7 @@ import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.ui.click.settings.impl.ModeSetting;
+import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.common.EnumUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
@@ -13,6 +14,8 @@ import org.lwjgl.input.Keyboard;
 
 public class BlockAnimation extends Module {
     private ModeSetting modeSetting;
+    private NumberSetting swingSpeedSetting;
+
     private BlockMode blockMode;
 
     public BlockAnimation() {
@@ -22,6 +25,7 @@ public class BlockAnimation extends Module {
     @Override
     protected void setupSettings() {
         this.settings.add(this.modeSetting = new ModeSetting("Mode", "Mode of blocking!", BlockMode.values(), BlockMode.VANILLA));
+        this.settings.add(this.swingSpeedSetting = new NumberSetting("Swing Speed", "How fast should the swing be?", 0.05f, 2, 1));
     }
 
     @EventTarget
@@ -76,6 +80,10 @@ public class BlockAnimation extends Module {
         GlStateManager.rotate(f1 * -20.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(f1 * -80.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.scale(0.4F, 0.4F, 0.4F);
+    }
+
+    public NumberSetting getSwingSpeedSetting() {
+        return swingSpeedSetting;
     }
 
     private enum BlockMode implements ModeSetting.ModeTemplate {
