@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 public class ClickGUI extends GuiScreen {
     private static final float PANEL_WIDTH = 100, PANEL_HEIGHT = 25;
+    public static Framebuffer BLOOM_BUFFER;
 
     private final ArrayList<CUIComponent> components;
     private boolean initialized = false;
-    private Framebuffer bloomBuffer;
     private final Animation inAnimation;
 
     public ClickGUI() {
@@ -32,14 +32,13 @@ public class ClickGUI extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
         RenderUtil.scale(width / 2f, height / 2f, this.inAnimation.animate());
-        bloomBuffer = RenderUtil.createFrameBuffer(bloomBuffer);
-        bloomBuffer.framebufferClear();
-        bloomBuffer.bindFramebuffer(true);
+        BLOOM_BUFFER.framebufferClear();
+        BLOOM_BUFFER.bindFramebuffer(true);
         for (CUIComponent component : this.components) {
             component.drawScreen(mouseX, mouseY, partialTicks);
         }
-        bloomBuffer.unbindFramebuffer();
-        RenderUtil.drawBloom(bloomBuffer.framebufferTexture, 25, 2, new Color(190, 35, 190), false);
+        BLOOM_BUFFER.unbindFramebuffer();
+        RenderUtil.drawBloom(BLOOM_BUFFER.framebufferTexture, 25, 2, new Color(190, 35, 190), false);
 
         for (CUIComponent component : this.components) {
             component.drawScreen(mouseX, mouseY, partialTicks);

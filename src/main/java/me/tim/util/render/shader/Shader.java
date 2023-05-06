@@ -10,10 +10,12 @@ import org.lwjgl.opengl.GL20;
 public abstract class Shader {
     private final ResourceLocation fragmentLoc, vertexLoc;
     private int programId;
+    private ScaledResolution resolution;
 
     public Shader(ResourceLocation fragmentLoc, ResourceLocation vertexLoc) {
         this.fragmentLoc = fragmentLoc;
         this.vertexLoc = vertexLoc;
+        this.resolution = new ScaledResolution(Statics.getMinecraft());
     }
 
     public Shader(ResourceLocation fragmentLoc) {
@@ -81,9 +83,8 @@ public abstract class Shader {
 
     public void drawQuads() {
         if (Statics.getMinecraft().gameSettings.ofFastRender) return;
-        ScaledResolution sr = new ScaledResolution(Statics.getMinecraft());
-        float width = (float) sr.getScaledWidth_double();
-        float height = (float) sr.getScaledHeight_double();
+        float width = (float) this.resolution.getScaledWidth_double();
+        float height = (float) this.resolution.getScaledHeight_double();
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2f(0, 1);
         GL11.glVertex2f(0, 0);
@@ -136,5 +137,13 @@ public abstract class Shader {
 
     public int getProgramId() {
         return programId;
+    }
+
+    public void setResolution(ScaledResolution resolution) {
+        this.resolution = resolution;
+    }
+
+    public ScaledResolution getResolution() {
+        return resolution;
     }
 }

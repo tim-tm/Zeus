@@ -2,6 +2,7 @@ package me.tim.util.render;
 
 import me.tim.Statics;
 import me.tim.util.common.MathUtil;
+import me.tim.util.render.shader.Shader;
 import me.tim.util.render.shader.impl.BloomShader;
 import me.tim.util.render.shader.impl.BlurShader;
 import me.tim.util.render.shader.impl.CircleShader;
@@ -25,6 +26,7 @@ import org.lwjgl.opengl.GL13;
 import javax.vecmath.Vector2f;
 import java.awt.*;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 public class RenderUtil {
     private static final RoundedRectShader ROUNDED_RECT_SHADER = new RoundedRectShader();
@@ -34,12 +36,18 @@ public class RenderUtil {
 
     public static Framebuffer BLOOM_FRAMEBUFFER = new Framebuffer(1, 1, false);
     public static Framebuffer BLUR_FRAMEBUFFER = new Framebuffer(1, 1, false);
+    public static final ArrayList<Shader> shaders;
 
     static {
-        ROUNDED_RECT_SHADER.setup();
-        BLOOM_SHADER.setup();
-        CIRCLE_SHADER.setup();
-        BLUR_SHADER.setup();
+        shaders = new ArrayList<>();
+        shaders.add(ROUNDED_RECT_SHADER);
+        shaders.add(BLOOM_SHADER);
+        shaders.add(CIRCLE_SHADER);
+        shaders.add(BLUR_SHADER);
+
+        for (Shader shader : shaders) {
+            shader.setup();
+        }
     }
 
     public static void drawRoundedRect(float x, float y, float x2, float y2, float radius, Color color) {

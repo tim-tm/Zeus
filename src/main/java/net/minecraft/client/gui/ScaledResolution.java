@@ -13,11 +13,15 @@ public class ScaledResolution
 
     public ScaledResolution(Minecraft p_i46445_1_)
     {
-        this.scaledWidth = p_i46445_1_.displayWidth;
-        this.scaledHeight = p_i46445_1_.displayHeight;
-        this.scaleFactor = 1;
-        boolean flag = p_i46445_1_.isUnicode();
-        int i = p_i46445_1_.gameSettings.particleSetting;
+        this(p_i46445_1_, p_i46445_1_.displayWidth, p_i46445_1_.displayHeight, 1);
+    }
+
+    public ScaledResolution(Minecraft mc, int scaledWidth, int scaledHeight, int scaleFactor) {
+        this.scaledWidth = scaledWidth;
+        this.scaledHeight = scaledHeight;
+        this.scaleFactor = scaleFactor;
+        boolean flag = mc.isUnicode();
+        int i = mc.gameSettings.particleSetting;
 
         if (i == 0)
         {

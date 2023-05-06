@@ -66,6 +66,7 @@ public class Zeus {
         RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
         RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
         GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
+        ClickGUI.BLOOM_BUFFER = RenderUtil.createFrameBuffer(ClickGUI.BLOOM_BUFFER);
     }
 
     public void shutdown() {

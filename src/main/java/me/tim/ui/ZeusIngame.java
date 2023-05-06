@@ -7,10 +7,13 @@ import me.tim.features.event.EventShader;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Module;
+import me.tim.ui.click.ClickGUI;
 import me.tim.util.common.MathUtil;
 import me.tim.util.render.RenderUtil;
+import me.tim.util.render.shader.Shader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
@@ -57,6 +60,10 @@ public class ZeusIngame {
         RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
         RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
         GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
+        for (Shader shader : RenderUtil.shaders) {
+            shader.setResolution(new ScaledResolution(Statics.getMinecraft(), eventResize.getWidth(), eventResize.getHeight(), 1));
+        }
+        ClickGUI.BLOOM_BUFFER = RenderUtil.createFrameBuffer(ClickGUI.BLOOM_BUFFER);
     }
 
     private void draw(ArrayList<Module> mods) {
