@@ -5,6 +5,7 @@ import me.tim.features.module.impl.combat.KillAura;
 import me.tim.features.module.impl.combat.Tickbase;
 import me.tim.features.module.impl.combat.Velocity;
 import me.tim.features.module.impl.exploit.Blink;
+import me.tim.features.module.impl.exploit.Disabler;
 import me.tim.features.module.impl.exploit.FastPlace;
 import me.tim.features.module.impl.exploit.Phase;
 import me.tim.features.module.impl.move.*;
@@ -38,6 +39,7 @@ public class ModuleManager {
         this.modules.add(new Teams());
 
         this.modules.add(new Blink());
+        this.modules.add(new Disabler());
         this.modules.add(new FastPlace());
         this.modules.add(new Phase());
 

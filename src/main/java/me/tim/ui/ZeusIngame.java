@@ -2,8 +2,8 @@ package me.tim.ui;
 
 import me.tim.Statics;
 import me.tim.features.event.EventRender2D;
-import me.tim.features.event.EventResize;
 import me.tim.features.event.EventShader;
+import me.tim.features.event.EventTick;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Module;
@@ -54,18 +54,20 @@ public class ZeusIngame {
     /**
      * Optimizations
      *
-     * @param eventResize
+     * @param eventTick
      */
     @EventTarget
-    private void onResize(EventResize eventResize) {
-        RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
-        RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
-        GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
-        for (Shader shader : RenderUtil.shaders) {
-            shader.setResolution(new ScaledResolution(Statics.getMinecraft(), eventResize.getWidth(), eventResize.getHeight(), 1));
+    private void onTick(EventTick eventTick) {
+        if (Statics.getPlayer() != null && Statics.getPlayer().ticksExisted % 20 == 0) {
+            RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
+            RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
+            GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
+            for (Shader shader : RenderUtil.shaders) {
+                shader.setResolution(new ScaledResolution(Statics.getMinecraft()));
+            }
+            ClickGUI.BLOOM_BUFFER = RenderUtil.createFrameBuffer(ClickGUI.BLOOM_BUFFER);
+            TargetHUD.bloomBuffer = RenderUtil.createFrameBuffer(TargetHUD.bloomBuffer);
         }
-        ClickGUI.BLOOM_BUFFER = RenderUtil.createFrameBuffer(ClickGUI.BLOOM_BUFFER);
-        TargetHUD.bloomBuffer = RenderUtil.createFrameBuffer(TargetHUD.bloomBuffer);
     }
 
     private void draw(ArrayList<Module> mods) {
