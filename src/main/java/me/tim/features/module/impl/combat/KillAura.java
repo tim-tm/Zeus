@@ -35,6 +35,7 @@ import viamcp.ViaMCP;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class KillAura extends Module {
     private ModeSetting switchModeSetting, autoBlockModeSetting, strafeModeSetting;
@@ -118,9 +119,13 @@ public class KillAura extends Module {
     private void onPre(EventPreMotion event) {
         event.setYaw(rotation.getYaw());
         event.setPitch(rotation.getPitch());
-        Statics.getPlayer().rotationYawHead = rotation.getYaw();
-        Statics.getPlayer().renderYawOffset = rotation.getYaw();
-        Statics.getPlayer().rotationPitchHead = rotation.getPitch();
+
+        float renderYaw = MathUtil.interpolate(rotation.getLastYaw(), rotation.getYaw(), Statics.getTimer().renderPartialTicks).floatValue();
+        float renderPitch = MathUtil.interpolate(rotation.getLastPitch(), rotation.getPitch(), Statics.getTimer().renderPartialTicks).floatValue();
+        Statics.getPlayer().rotationYawHead = renderYaw;
+        Statics.getPlayer().renderYawOffset = renderYaw;
+        Statics.getPlayer().rotationPitchHead = renderPitch;
+
         this.handleAutoAnnoy();
     }
 
@@ -228,10 +233,8 @@ public class KillAura extends Module {
                 }
                 break;
             case POST:
-                switch (this.blockMode) {
-                    case DEFAULT:
-                        Statics.getGameSettings().keyBindDrop.pressed = true;
-                        break;
+                if (Objects.requireNonNull(this.blockMode) == BlockMode.DEFAULT) {
+                    Statics.getGameSettings().keyBindDrop.pressed = true;
                 }
                 break;
         }

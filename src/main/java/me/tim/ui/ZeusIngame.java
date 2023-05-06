@@ -2,13 +2,15 @@ package me.tim.ui;
 
 import me.tim.Statics;
 import me.tim.features.event.EventRender2D;
+import me.tim.features.event.EventResize;
 import me.tim.features.event.EventShader;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Module;
 import me.tim.util.common.MathUtil;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
@@ -45,13 +47,25 @@ public class ZeusIngame {
         RenderUtil.drawRoundedRect(i - 91, eventShader.getHeight() - 22, i + 91, eventShader.getHeight(), 4f, new Color(0, 0, 0));
     }
 
+    /**
+     * Optimizations
+     *
+     * @param eventResize
+     */
+    @EventTarget
+    private void onResize(EventResize eventResize) {
+        RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
+        RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
+        GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
+    }
+
     private void draw(ArrayList<Module> mods) {
         int index = 0;
         for (Module module : mods) {
             if (!module.isEnabled()) continue;
 
-            final int height = Statics.getFontRenderer().FONT_HEIGHT;
-            int x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName());
+            final float height = Statics.getFontRenderer().FONT_HEIGHT;
+            float x = 5, y = 5 + (index * height), width = Statics.getFontRenderer().getStringWidth(module.getName());
             final Color c = this.calcColor(index, mods.size());
             if (!module.getSuffix().isEmpty()) {
                 width += Statics.getFontRenderer().getStringWidth(" " + module.getSuffix());

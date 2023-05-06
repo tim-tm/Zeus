@@ -1,9 +1,10 @@
 package me.tim;
 
 import me.tim.features.event.EventMove;
+import me.tim.util.render.font.CFontRenderer;
+import me.tim.util.render.font.FontUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.settings.GameSettings;
@@ -44,8 +45,8 @@ public class Statics {
         getMinecraft().session = session;
     }
 
-    public static FontRenderer getFontRenderer() {
-        return getMinecraft().fontRendererObj;
+    public static CFontRenderer getFontRenderer() {
+        return FontUtil.normal;
     }
 
     public static GameSettings getGameSettings() {

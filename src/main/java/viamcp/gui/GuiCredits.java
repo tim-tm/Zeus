@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class GuiCredits extends GuiScreen
 {
-    private GuiScreen parent;
+    private final GuiScreen parent;
 
     public GuiCredits(GuiScreen parent)
     {

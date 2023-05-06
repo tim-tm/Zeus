@@ -7,7 +7,7 @@ import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
 import me.tim.features.module.impl.player.Teams;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;

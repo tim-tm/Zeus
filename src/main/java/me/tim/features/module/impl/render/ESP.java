@@ -9,7 +9,7 @@ import me.tim.features.module.impl.player.Teams;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.util.common.EnumUtil;
 import me.tim.util.common.MathUtil;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;

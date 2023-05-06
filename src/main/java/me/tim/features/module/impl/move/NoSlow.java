@@ -12,6 +12,8 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Objects;
+
 public class NoSlow extends Module {
     private ModeSetting modeSetting;
 
@@ -33,11 +35,9 @@ public class NoSlow extends Module {
         this.setSuffix(this.mode.getName());
 
         if (Statics.getPlayer().isUsingItem()) {
-            switch (this.mode) {
-                case GRIM:
-                    Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem % 8 + 1));
-                    Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem));
-                    break;
+            if (Objects.requireNonNull(this.mode) == NoSlowMode.GRIM) {
+                Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem % 8 + 1));
+                Statics.sendPacket(new C09PacketHeldItemChange(Statics.getPlayer().inventory.currentItem));
             }
         }
     }

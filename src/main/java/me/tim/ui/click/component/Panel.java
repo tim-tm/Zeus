@@ -3,7 +3,7 @@ package me.tim.ui.click.component;
 import me.tim.Statics;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.vecmath.Vector2f;
@@ -13,8 +13,9 @@ import java.util.ArrayList;
 
 public class Panel implements CUIComponent {
     private final Category category;
-    private ArrayList<ModuleButton> moduleButtons;
-    private Vector2f position, dragPosition;
+    private final ArrayList<ModuleButton> moduleButtons;
+    private Vector2f position;
+    private final Vector2f dragPosition;
     private Vector2f size;
     private boolean dragging, extended;
 

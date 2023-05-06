@@ -6,7 +6,7 @@ import me.tim.ui.click.settings.Setting;
 import me.tim.ui.click.settings.impl.BooleanSetting;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.ui.click.settings.impl.NumberSetting;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;

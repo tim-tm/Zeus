@@ -1,4 +1,4 @@
-package me.tim.util.render.shader;
+package me.tim.util.render;
 
 import me.tim.Statics;
 import me.tim.util.common.MathUtil;
@@ -32,8 +32,8 @@ public class RenderUtil {
     private static final CircleShader CIRCLE_SHADER = new CircleShader();
     private static final BlurShader BLUR_SHADER = new BlurShader();
 
-    private static Framebuffer BLOOM_FRAMEBUFFER = new Framebuffer(1, 1, false);
-    private static Framebuffer BLUR_FRAMEBUFFER = new Framebuffer(1, 1, false);
+    public static Framebuffer BLOOM_FRAMEBUFFER = new Framebuffer(1, 1, false);
+    public static Framebuffer BLUR_FRAMEBUFFER = new Framebuffer(1, 1, false);
 
     static {
         ROUNDED_RECT_SHADER.setup();
@@ -107,7 +107,6 @@ public class RenderUtil {
     }
 
     public static void drawBloom(int sourceTexture, int radius, int offset, Color color, boolean projected) {
-        BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(BLOOM_FRAMEBUFFER);
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.0f);
         GlStateManager.enableBlend();
@@ -153,7 +152,6 @@ public class RenderUtil {
     }
 
     public static void drawBlur(int radius, int offset, boolean projected) {
-        BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(BLUR_FRAMEBUFFER);
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.0f);
         GlStateManager.enableBlend();
@@ -303,5 +301,27 @@ public class RenderUtil {
         GlStateManager.translate(centerX, centerY, 0);
         GlStateManager.scale(scale, scale, 0);
         GlStateManager.translate(-centerX, -centerY, 0);
+    }
+
+    public static float[] normalizeColor(final Color color) {
+        return new float[]{
+            color.getRed() / 255f,
+            color.getGreen() / 255f,
+            color.getBlue() / 255f,
+            color.getAlpha() / 255f
+        };
+    }
+
+    public static void glColor(final Color color) {
+        final float[] col = normalizeColor(color);
+        GL11.glColor4f(col[0], col[1], col[2], col[3]);
+    }
+
+    public static int reAlpha(int color, float alpha) {
+        Color c = new Color(color);
+        float r = c.getRed() / 255f;
+        float g = c.getGreen() / 255f;
+        float b = c.getBlue() / 255f;
+        return new Color(r, g, b, alpha).getRGB();
     }
 }

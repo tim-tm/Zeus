@@ -67,7 +67,6 @@ public class Cleaner extends Module {
             Statics.sendPacket(new C0BPacketEntityAction(Statics.getPlayer(), C0BPacketEntityAction.Action.OPEN_INVENTORY));
             this.clean();
             Statics.sendPacket(new C0DPacketCloseWindow(0));
-            return;
         } else if (lastPassed) {
             this.startTimer.reset();
         } else if (Statics.getMinecraft().currentScreen != null && Statics.getMinecraft().currentScreen instanceof GuiInventory) {

@@ -104,7 +104,7 @@ public class ConfigManager {
 
     public void save(Class<? extends Config> clazz) {
         for (OnlineConfig onlineConfig : this.onlineConfigs) {
-            if (onlineConfig.getClass().equals(clazz)) onlineConfig.save();;
+            if (onlineConfig.getClass().equals(clazz)) onlineConfig.save();
         }
 
         for (LocalConfig localConfig : localConfigs) {

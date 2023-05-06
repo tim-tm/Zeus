@@ -11,6 +11,8 @@ import me.tim.ui.click.settings.impl.NumberSetting;
 import me.tim.util.common.EnumUtil;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Objects;
+
 public class Speed extends Module {
     private ModeSetting modeSetting;
     private NumberSetting vanillaSpeedSetting;
@@ -35,10 +37,8 @@ public class Speed extends Module {
         this.setSuffix(this.mode.getName());
         this.vanillaSpeedSetting.setVisible(this.mode.equals(SpeedMode.VANILLA));
 
-        switch (this.mode) {
-            case VANILLA:
-                Statics.setMoveSpeed(eventMove, this.vanillaSpeedSetting.getValue());
-                break;
+        if (Objects.requireNonNull(this.mode) == SpeedMode.VANILLA) {
+            Statics.setMoveSpeed(eventMove, this.vanillaSpeedSetting.getValue());
         }
     }
 

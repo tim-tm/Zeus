@@ -179,7 +179,7 @@ public class LinkedList<T> {
             stringbuffer.append(node.getItem());
         }
 
-        return "" + this.size + " [" + stringbuffer.toString() + "]";
+        return this.size + " [" + stringbuffer + "]";
     }
 
     public static class Node<T> {
@@ -218,7 +218,7 @@ public class LinkedList<T> {
         }
 
         public String toString() {
-            return "" + this.item;
+            return String.valueOf(this.item);
         }
     }
 }

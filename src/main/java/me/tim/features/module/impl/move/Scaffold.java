@@ -13,7 +13,7 @@ import me.tim.util.common.EnumUtil;
 import me.tim.util.player.BlockUtil;
 import me.tim.util.player.InventoryUtil;
 import me.tim.util.player.rotation.Rotation;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.block.BlockAir;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemSlab;
@@ -25,6 +25,7 @@ import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class Scaffold extends Module {
     private ModeSetting rotationModeSetting, towerModeSetting;
@@ -125,11 +126,9 @@ public class Scaffold extends Module {
 
         float yaw = this.rotation.getYaw();
         float pitch = this.rotation.getPitch();
-        switch (rotationMode) {
-            case OFF:
-                yaw = event.getYaw();
-                pitch = event.getPitch();
-                break;
+        if (Objects.requireNonNull(rotationMode) == RotationMode.OFF) {
+            yaw = event.getYaw();
+            pitch = event.getPitch();
         }
 
         event.setYaw(yaw);

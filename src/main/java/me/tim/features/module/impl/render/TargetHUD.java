@@ -9,7 +9,7 @@ import me.tim.features.module.Module;
 import me.tim.features.module.impl.combat.KillAura;
 import me.tim.ui.click.settings.impl.BooleanSetting;
 import me.tim.util.common.MathUtil;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.MathHelper;

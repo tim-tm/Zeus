@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class GuiProtocolSelector extends GuiScreen
 {
-    private GuiScreen parent;
+    private final GuiScreen parent;
     public SlotList list;
 
     public GuiProtocolSelector(GuiScreen parent)

@@ -5,7 +5,7 @@ import me.tim.ui.click.component.CUIComponent;
 import me.tim.ui.click.component.Panel;
 import me.tim.util.render.animation.Animation;
 import me.tim.util.render.animation.AnimationType;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;

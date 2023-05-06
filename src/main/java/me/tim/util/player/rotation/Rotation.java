@@ -75,6 +75,8 @@ public class Rotation {
     public void reset() {
         this.yaw = Statics.getPlayer().rotationYaw;
         this.pitch = Statics.getPlayer().rotationPitch;
+        this.lastYaw = Statics.getPlayer().prevRotationYaw;
+        this.lastPitch = Statics.getPlayer().prevRotationPitch;
     }
 
     public void strafe(EventStrafe eventStrafe, StrafeMode mode, boolean keepSprint) {

@@ -15,9 +15,11 @@ import me.tim.ui.click.ClickGUI;
 import me.tim.ui.notify.Notification;
 import me.tim.ui.notify.NotificationRenderer;
 import me.tim.util.common.FileUtil;
+import me.tim.util.render.RenderUtil;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.network.play.server.S48PacketResourcePackSend;
 import net.minecraft.util.ResourceLocation;
 import viamcp.ViaMCP;
@@ -60,6 +62,10 @@ public class Zeus {
 
         ViaMCP.getInstance().start();
         ViaMCP.getInstance().initAsyncSlider();
+
+        RenderUtil.BLOOM_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLOOM_FRAMEBUFFER);
+        RenderUtil.BLUR_FRAMEBUFFER = RenderUtil.createFrameBuffer(RenderUtil.BLUR_FRAMEBUFFER);
+        GuiIngame.BLOOM_BUFFER = RenderUtil.createFrameBuffer(GuiIngame.BLOOM_BUFFER);
     }
 
     public void shutdown() {

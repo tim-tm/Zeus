@@ -6,28 +6,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import me.tim.Statics;
-import me.tim.features.event.EventMove;
-import me.tim.features.event.EventPacket;
-import me.tim.features.event.api.EventManager;
-import me.tim.features.event.api.EventTarget;
-import me.tim.features.friend.Friend;
 import me.tim.ui.notify.Notification;
 import me.tim.util.SessionUtil;
 import me.tim.util.common.FileUtil;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.network.EnumConnectionState;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.handshake.client.C00Handshake;
-import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
@@ -201,9 +191,9 @@ public class AltManager extends GuiScreen {
         public void initGui() {
             Keyboard.enableRepeatEvents(true);
 
-            this.user = new GuiTextField(0, Statics.getFontRenderer(), this.width / 2 - 50, this.height / 2 - 70, 100, 15);
+            this.user = new GuiTextField(0, Statics.getMinecraft().fontRendererObj, this.width / 2 - 50, this.height / 2 - 70, 100, 15);
             this.user.setText("User");
-            this.password = new GuiTextField(1, Statics.getFontRenderer(), this.width / 2 - 50, this.height / 2 - 40, 100, 15);
+            this.password = new GuiTextField(1, Statics.getMinecraft().fontRendererObj, this.width / 2 - 50, this.height / 2 - 40, 100, 15);
             this.password.setText("Password");
 
             this.buttonList.add(new GuiButton(2, this.width / 2 - 25, this.height / 2 - 10, 50, 15, "Submit"));

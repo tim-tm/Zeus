@@ -30,6 +30,6 @@ public class EventPacket extends EventCancelable {
 
     public enum State {
         SEND,
-        RECEIVE;
+        RECEIVE
     }
 }

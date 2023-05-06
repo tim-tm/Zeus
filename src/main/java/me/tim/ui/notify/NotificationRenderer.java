@@ -5,7 +5,7 @@ import me.tim.features.event.EventRender2D;
 import me.tim.features.event.EventShader;
 import me.tim.features.event.api.EventManager;
 import me.tim.features.event.api.EventTarget;
-import me.tim.util.render.shader.RenderUtil;
+import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
