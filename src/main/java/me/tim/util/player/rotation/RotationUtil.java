@@ -3,6 +3,7 @@ package me.tim.util.player.rotation;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import me.tim.Statics;
+import me.tim.util.common.MathUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
@@ -110,5 +111,17 @@ public class RotationUtil {
         Vec3 vec32 = vec3.addVector(vec31.xCoord * range, vec31.yCoord * range, vec31.zCoord * range);
         MovingObjectPosition pos = Statics.getWorld().rayTraceBlocks(vec3, vec32, false, false, true);
         return Statics.getWorld().getBlockState(pos.getBlockPos()).getBlock();
+    }
+
+    public static boolean isInFOV(Entity entity, float angle) {
+        angle *= 0.8f;
+        double diff = MathUtil.angleDiff(Statics.getPlayer().rotationYaw, getRotations(entity).x);
+        return (diff > 0 && diff < angle) || (-angle < diff && diff < 0);
+    }
+
+    public static boolean isInFOV(Vec3 vec3, float angle) {
+        angle *= 0.8f;
+        double diff = MathUtil.angleDiff(Statics.getPlayer().rotationYaw, getRotations(vec3).x);
+        return (diff > 0 && diff < angle) || (-angle < diff && diff < 0);
     }
 }

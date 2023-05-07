@@ -37,4 +37,8 @@ public class MathUtil {
         weights.rewind();
         return weights;
     }
+
+    public static Double angleDiff(double d, double d1) {
+        return ((((d - d1) % 360D) + 540D) % 360D) - 180D;
+    }
 }

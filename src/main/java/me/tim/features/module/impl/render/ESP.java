@@ -9,6 +9,7 @@ import me.tim.features.module.impl.player.Teams;
 import me.tim.ui.click.settings.impl.ModeSetting;
 import me.tim.util.common.EnumUtil;
 import me.tim.util.common.MathUtil;
+import me.tim.util.player.rotation.RotationUtil;
 import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -47,6 +49,7 @@ public class ESP extends Module {
         for (Entity entity : Statics.getWorld().loadedEntityList) {
             if (!(entity instanceof EntityPlayer) || entity.isInvisible()) continue;
             if (entity == Statics.getPlayer() && Statics.getGameSettings().showDebugInfo == 0) continue;
+            if (entity != Statics.getPlayer() && Statics.getGameSettings().showDebugInfo == 0 && !RotationUtil.isInFOV(entity, Statics.getGameSettings().gammaSetting)) continue;
             if (this.teamsModule.isEnabled() && this.teamsModule.getTeammates().contains(entity.getName())) continue;
             if (Statics.getZeus().friendManager.contains(entity.getName())) continue;
 
@@ -93,6 +96,8 @@ public class ESP extends Module {
         }
 
         for (TileEntity tileEntity : Statics.getWorld().loadedTileEntityList) {
+            if (!RotationUtil.isInFOV(new Vec3(tileEntity.getPos()), Statics.getGameSettings().gammaSetting)) continue;
+
             if (tileEntity instanceof TileEntityChest || tileEntity instanceof TileEntityEnderChest) {
                 RenderUtil.drawBlockOutline(tileEntity.getPos(), new Color(205, 45, 205));
             }
