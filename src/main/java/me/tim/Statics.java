@@ -171,6 +171,10 @@ public class Statics {
         Statics.getPlayer().sendQueue.addToSendQueue(packet);
     }
 
+    public static void sendPacketNoEvent(Packet<?> packet) {
+        Statics.getMinecraft().getNetHandler().getNetworkManager().sendPacketNoEvent(packet);
+    }
+
     public static void multMotion(float multiplier) {
         getPlayer().motionX *= multiplier;
         getPlayer().motionZ *= multiplier;
