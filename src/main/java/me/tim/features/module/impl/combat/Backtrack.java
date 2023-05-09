@@ -31,7 +31,7 @@ public class Backtrack extends Module {
 
     private final Timer timer;
     private final TrackingInformation entityInformation;
-    private final LinkedList<Packet> packets;
+    private final LinkedList<Packet<?>> packets;
 
     public Backtrack() {
         super("Backtrack", "Hit last entity positions!", Keyboard.KEY_NONE, Category.COMBAT);
@@ -48,10 +48,12 @@ public class Backtrack extends Module {
     @EventTarget
     private void onJoin(EventJoin eventJoin) {
         this.entityInformation.reset();
+        this.packets.clear();
     }
 
     @EventTarget
     private void onPre(EventPreMotion eventPreMotion) {
+        this.setSuffix(String.valueOf(this.delaySetting.getValue()));
         if (this.entityInformation == null) return;
 
         if ((this.entityInformation.entity == null || this.entityInformation.entity.isDead) && (this.entityInformation.realPosition == null || !this.entityInformation.realPosition.equals(new Vec3(0, 0, 0)))) {
@@ -100,14 +102,7 @@ public class Backtrack extends Module {
                     }
                 } else {
                     if (this.packets.size() > 0) {
-                        Packet p = this.packets.poll();
-                        if (p instanceof C00PacketKeepAlive) {
-                            Statics.sendPacket(p);
-                        }
-
-                        if (p instanceof S14PacketEntity) {
-                            p.processPacket(Statics.getMinecraft().getNetHandler().getNetworkManager().getNetHandler());
-                        }
+                        Statics.sendPacketNoEvent(this.packets.poll());
                     }
                 }
                 break;
@@ -120,7 +115,6 @@ public class Backtrack extends Module {
                     if (this.entityInformation.hit && entity != null && entity.equals(this.entityInformation.entity)) {
                         if (!this.timer.elapsed((long) this.delaySetting.getValue())) {
                             eventPacket.setCancelled(true);
-                            this.packets.add(eventPacket.getPacket());
 
                             double posX = packetEntity.getX() / 32.0D;
                             double posY = packetEntity.getX() / 32.0D;
@@ -146,6 +140,11 @@ public class Backtrack extends Module {
     public void onDisable() {
         super.onDisable();
         this.entityInformation.reset();
+        if (Statics.getPlayer() != null) {
+            while (this.packets.size() > 0) {
+                Statics.sendPacketNoEvent(this.packets.poll());
+            }
+        }
     }
 
     private static final class TrackingInformation {

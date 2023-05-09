@@ -23,8 +23,6 @@ public class NumberSetting extends Setting {
 
     @Override
     public float draw(Vector2f position, Vector2f size, float offset, int mouseX, int mouseY) {
-        RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + size.x, position.y + size.y * 2 + offset, new Color(35, 35, 35));
-
         String settingName = this.getName();
         if (this.isDragging()) {
             float diff = this.getMaxValue() - this.getMinValue();
@@ -32,7 +30,7 @@ public class NumberSetting extends Setting {
             this.setValue(val);
 
             float factor = MathUtil.percentage(this.getValue() - this.getMinValue(), this.getMaxValue() - this.getMinValue());
-            RenderUtil.drawRect(position.x, position.y + offset + size.y, position.x + (size.x * factor), position.y + size.y * 2 + offset, new Color(200, 25, 200));
+            RenderUtil.drawRoundedRect(position.x, position.y + offset + size.y, position.x + (size.x * factor), position.y + size.y * 2 + offset, 6f, new Color(200, 25, 200));
             settingName = String.valueOf(Math.round(this.getValue() * 100D) / 100D);
         }
 

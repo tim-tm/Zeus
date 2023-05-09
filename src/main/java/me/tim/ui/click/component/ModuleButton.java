@@ -28,7 +28,9 @@ public class ModuleButton implements CUIComponent {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        RenderUtil.drawRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, this.module.isEnabled() ? new Color(200, 25, 200, 255) : new Color(35, 35, 35, 255));
+        if (this.module.isEnabled()) {
+            RenderUtil.drawRoundedRect(this.position.x, this.position.y, this.position.x + this.size.x, this.position.y + this.size.y, 6f, new Color(200, 25, 200, 255));
+        }
         Statics.getFontRenderer().drawString(module.getName(), (int) (this.position.x + this.size.x / 2 - Statics.getFontRenderer().getStringWidth(module.getName()) / 2), (int) (this.position.y + this.size.y / 2 - Statics.getFontRenderer().FONT_HEIGHT / 2), -1);
 
         if (this.extended && !this.module.getSettings().isEmpty()) {
