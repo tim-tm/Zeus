@@ -46,7 +46,7 @@ public class Statics {
     }
 
     public static CFontRenderer getFontRenderer() {
-        return FontUtil.normal;
+        return FontUtil.volte_semibold;
     }
 
     public static GameSettings getGameSettings() {

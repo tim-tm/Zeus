@@ -13,7 +13,6 @@ import me.tim.util.player.rotation.RotationUtil;
 import me.tim.util.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,12 +24,12 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class ESP extends Module {
     private ModeSetting modeSetting;
     
     private Teams teamsModule;
-    private Framebuffer entityBuffer = new Framebuffer(1, 1, false);
 
     public ESP() {
         super("ESP", "See people through walls!", Keyboard.KEY_NONE, Category.RENDER);
@@ -58,40 +57,29 @@ public class ESP extends Module {
             double y = MathUtil.interpolate(entity.lastTickPosY, entity.posY, eventRender3D.getPartialTicks()) - Statics.getMinecraft().getRenderManager().renderPosY;
             double z = MathUtil.interpolate(entity.lastTickPosZ, entity.posZ, eventRender3D.getPartialTicks()) - Statics.getMinecraft().getRenderManager().renderPosZ;
 
-            switch (mode) {
-                case TWOD:
-                    GL11.glPushMatrix();
-                    GL11.glTranslated(x, y - 0.2D, z);
-                    GL11.glScalef(0.03f, 0.03f, 0.03f);
-                    GL11.glRotated(-Statics.getMinecraft().getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
-                    int lineW = 2;
-                    float healthFactor = MathUtil.percentage(player.getHealth(), player.getMaxHealth());
-                    healthFactor = MathHelper.clamp_float(healthFactor, 0, 1);
+            int lineW = 2;
+            float healthFactor = MathUtil.percentage(player.getHealth(), player.getMaxHealth());
+            healthFactor = MathHelper.clamp_float(healthFactor, 0, 1);
 
-                    int colorHealth = (int) (255 * healthFactor);
-                    int color = new Color(255 - colorHealth, colorHealth, 0).getRGB();
-                    GlStateManager.color(1, 1, 1, 1);
-                    GlStateManager.disableDepth();
+            int colorHealth = (int) (255 * healthFactor);
+            int color = new Color(255 - colorHealth, colorHealth, 0).getRGB();
 
-                    // Health-Bar
-                    Gui.drawRect(21, 0, 21 + lineW, (int) (70 * healthFactor), color);
+            if (Objects.requireNonNull(mode) == ESPMode.TWOD) {
+                GL11.glPushMatrix();
+                GL11.glTranslated(x, y - 0.2D, z);
+                GL11.glScalef(0.03f, 0.03f, 0.03f);
+                GL11.glRotated(-Statics.getMinecraft().getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
+                GlStateManager.color(1, 1, 1, 1);
+                GlStateManager.disableDepth();
 
-                    // ESP
-                    RenderUtil.drawEntityBox2d(player, lineW, new Color(205, 45, 205));
+                // Health-Bar
+                Gui.drawRect(21, 0, 21 + lineW, (int) (70 * healthFactor), color);
 
-                    GlStateManager.enableDepth();
-                    GL11.glPopMatrix();
-                    break;
-                case SHADER:
-                    GlStateManager.pushMatrix();
-                    entityBuffer = RenderUtil.createFrameBuffer(entityBuffer);
-                    entityBuffer.framebufferClear();
-                    entityBuffer.bindFramebuffer(true);
-                    Statics.getMinecraft().getRenderManager().renderEntitySimple(player, eventRender3D.getPartialTicks());
-                    entityBuffer.unbindFramebuffer();
-                    RenderUtil.drawBloom(entityBuffer.framebufferTexture, 15, 2, new Color(205, 45, 205), true);
-                    GlStateManager.popMatrix();
-                    break;
+                // ESP
+                RenderUtil.drawEntityBox2d(player, lineW, new Color(205, 45, 205));
+
+                GlStateManager.enableDepth();
+                GL11.glPopMatrix();
             }
         }
 

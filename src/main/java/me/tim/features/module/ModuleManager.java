@@ -51,6 +51,7 @@ public class ModuleManager {
         this.modules.add(new ItemPhysics());
         this.modules.add(new MotionGraph());
         this.modules.add(new NoCameraClip());
+        this.modules.add(new Particles());
         this.modules.add(new Radar());
         this.modules.add(new TargetHUD());
     }

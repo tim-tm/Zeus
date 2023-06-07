@@ -2,6 +2,7 @@ package me.tim.util.render.font;
 
 import java.awt.*;
 
+@SuppressWarnings("unused")
 public class FontUtil {
     public static CFontRenderer normal = new CFontRenderer("normal.ttf", Font.PLAIN, 16, 7, false);
     public static CFontRenderer other = new CFontRenderer("other.ttf", Font.PLAIN, 16, 7, false);
@@ -18,6 +19,10 @@ public class FontUtil {
     public static CFontRenderer poppins_light = new CFontRenderer("/poppins/Poppins-Light.ttf", Font.PLAIN, 16, 7, false);
     public static CFontRenderer poppins_medium = new CFontRenderer("/poppins/Poppins-Medium.ttf", Font.PLAIN, 16, 7, false);
     public static CFontRenderer poppins_semibold = new CFontRenderer("/poppins/Poppins-SemiBold.ttf", Font.PLAIN, 16, 7, false);
+
+    public static CFontRenderer volte = new CFontRenderer("/volte/volte-medium.otf", Font.PLAIN, 16, 7, false);
+    public static CFontRenderer volte_bold = new CFontRenderer("/volte/volte-bold.otf", Font.PLAIN, 16, 7, false);
+    public static CFontRenderer volte_semibold = new CFontRenderer("/volte/volte-semibold.ttf", Font.PLAIN, 16, 7, false);
 
 
     public static CFontRenderer makeFont(String name, int size) {

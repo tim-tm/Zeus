@@ -1,7 +1,7 @@
 package me.tim.features.module.impl.render;
 
 import me.tim.features.event.EventRenderItem;
-import me.tim.features.event.EventTick;
+import me.tim.features.event.EventUpdate;
 import me.tim.features.event.api.EventTarget;
 import me.tim.features.module.Category;
 import me.tim.features.module.Module;
@@ -29,7 +29,7 @@ public class BlockAnimation extends Module {
     }
 
     @EventTarget
-    private void onTick(EventTick eventTick) {
+    private void onUpdate(EventUpdate eventUpdate) {
         this.blockMode = (BlockMode) EnumUtil.fromName(this.modeSetting.getCurrentMode().getName(), BlockMode.values());
     }
 

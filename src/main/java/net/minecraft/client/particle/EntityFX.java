@@ -1,5 +1,7 @@
 package net.minecraft.client.particle;
 
+import me.tim.Statics;
+import me.tim.features.module.impl.render.Particles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -41,6 +43,8 @@ public class EntityFX extends Entity
     public static double interpPosY;
     public static double interpPosZ;
 
+    private final Particles particlesModule;
+
     protected EntityFX(World worldIn, double posXIn, double posYIn, double posZIn)
     {
         super(worldIn);
@@ -56,6 +60,7 @@ public class EntityFX extends Entity
         this.particleScale = (this.rand.nextFloat() * 0.5F + 0.5F) * 2.0F;
         this.particleMaxAge = (int)(4.0F / (this.rand.nextFloat() * 0.9F + 0.1F));
         this.particleAge = 0;
+        this.particlesModule = (Particles) Statics.getZeus().moduleManager.getModuleByClass(Particles.class);
     }
 
     public EntityFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
@@ -180,6 +185,10 @@ public class EntityFX extends Entity
         float f2 = (float)this.particleTextureIndexY / 16.0F;
         float f3 = f2 + 0.0624375F;
         float f4 = 0.1F * this.particleScale;
+
+        if (this.particlesModule.isEnabled()) {
+            f4 *= this.particlesModule.getScaleSetting().getValue();
+        }
 
         if (this.particleIcon != null)
         {

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Zeus {
-    public static final String VERSION = "v0.4";
+    public static final String VERSION = "v0.5";
 
     public ModuleManager moduleManager;
     public NotificationRenderer notificationRenderer;

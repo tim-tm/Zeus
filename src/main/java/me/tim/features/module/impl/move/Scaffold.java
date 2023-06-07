@@ -91,23 +91,12 @@ public class Scaffold extends Module {
             case NCP:
                 Statics.getPlayer().motionX = 0;
                 Statics.getPlayer().motionZ = 0;
-
-                if (Statics.getPlayer().ticksExisted % 4 == 0) {
-                    Statics.getPlayer().setPosition(Statics.getPlayer().posX, MathHelper.floor_double(Statics.getPlayer().posY), Statics.getPlayer().posZ);
+                if (Statics.getPlayer().motionY >= 0.1) {
+                    Statics.getPlayer().setPosition(Statics.getPlayer().posX, MathHelper.ceiling_double_int(Statics.getPlayer().posY), Statics.getPlayer().posZ);
                 }
                 break;
             case FORWARD:
                 Statics.getGameSettings().keyBindLeft.pressed = Statics.getPlayer().ticksExisted % 2 == 0;
-                break;
-            case TIMER:
-                Statics.getPlayer().motionX = 0;
-                Statics.getPlayer().motionZ = 0;
-
-                if (!Statics.getPlayer().onGround && Statics.getPlayer().ticksExisted % 3 == 0) {
-                    Statics.getTimer().timerSpeed = 1.2f;
-                } else {
-                    Statics.getTimer().timerSpeed = 1;
-                }
                 break;
         }
     }
@@ -222,8 +211,7 @@ public class Scaffold extends Module {
     private enum TowerMode implements ModeSetting.ModeTemplate {
         VANILLA("Vanilla"),
         NCP("NCP"),
-        FORWARD("Forward"),
-        TIMER("Timer");
+        FORWARD("Forward");
 
         private final String name;
 

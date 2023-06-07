@@ -80,7 +80,7 @@ public class Rotation {
     }
 
     public void strafe(EventStrafe eventStrafe, StrafeMode mode, boolean keepSprint) {
-        if (this.getYaw() == eventStrafe.getYaw()) return;
+        if (mode.equals(StrafeMode.OFF) || this.getYaw() == eventStrafe.getYaw()) return;
 
         if (Statics.getPlayer().isSprinting() && !keepSprint) {
             eventStrafe.setFriction(Statics.getPlayer().onGround ? 0.09999999f : 0.02f);
